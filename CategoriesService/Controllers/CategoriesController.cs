@@ -18,10 +18,6 @@ public class CategoriesController : ControllerBase
         _service = service;
     }
 
-
-    /// <summary>
-    /// Obtener todas las categorías visibles para el usuario (personales + globales)
-    /// </summary>
     [HttpGet]
     public async Task<IActionResult> GetMergedCategories([FromQuery] Guid userId)
     {
@@ -29,9 +25,6 @@ public class CategoriesController : ControllerBase
         return Ok(result);
     }
 
-    /// <summary>
-    /// Obtener solo las categorías globales (admin)
-    /// </summary>
     [HttpGet("admin")]
     [Authorize(Roles = "clear-budget-admin")]
     public async Task<IActionResult> GetAdminCategories()
@@ -40,9 +33,6 @@ public class CategoriesController : ControllerBase
         return Ok(result);
     }
 
-    /// <summary>
-    /// Crear una categoría personal del usuario
-    /// </summary>
     [HttpPost("user")]
     public async Task<IActionResult> CreateUserCategory([FromBody] CategoryCreateDTO dto)
     {
@@ -51,9 +41,6 @@ public class CategoriesController : ControllerBase
         return CreatedAtAction(nameof(GetMergedCategories), new { userId }, result);
     }
 
-    /// <summary>
-    /// Crear una categoría global (admin)
-    /// </summary>
     [HttpPost("admin")]
     [Authorize(Roles = "clear-budget-admin")]
     public async Task<IActionResult> CreateAdminCategory([FromBody] CategoryCreateDTO dto)
@@ -62,9 +49,6 @@ public class CategoriesController : ControllerBase
         return Created(nameof(GetAdminCategories), result);
     }
 
-    /// <summary>
-    /// Actualizar el color de una categoría
-    /// </summary>
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateCategoryColor(Guid id, [FromBody] CategoryUpdateDTO dto)
     {
@@ -73,9 +57,6 @@ public class CategoriesController : ControllerBase
         return result ? NoContent() : NotFound();
     }
 
-    /// <summary>
-    /// Eliminar categoría de usuario
-    /// </summary>
     [HttpDelete("user/{id}")]
     public async Task<IActionResult> DeleteUserCategory(Guid id)
     {

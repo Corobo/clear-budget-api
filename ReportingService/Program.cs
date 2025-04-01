@@ -4,6 +4,8 @@ using Microsoft.OpenApi.Models;
 using ReportingService.Clients.Impl;
 using ReportingService.Clients;
 using ReportingService.Services;
+using Newtonsoft.Json.Linq;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,8 +35,31 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateAudience = true,
-            ValidateIssuer = true,
-            RoleClaimType = "roles" // Keycloak puts roles under "roles"
+            ValidateIssuer = true
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = context =>
+            {
+                if (context.Principal?.Identity is ClaimsIdentity identity)
+                {
+                    var resourceAccess = context.Principal.FindFirst("resource_access")?.Value;
+                    if (resourceAccess != null)
+                    {
+                        var parsed = JObject.Parse(resourceAccess);
+                        var appRoles = parsed["clear-budget"]?["roles"];
+
+                        if (appRoles is JArray roles)
+                        {
+                            foreach (var role in roles)
+                            {
+                                identity.AddClaim(new Claim(ClaimTypes.Role, role!.ToString()));
+                            }
+                        }
+                    }
+                }
+                return Task.CompletedTask;
+            }
         };
     });
 
