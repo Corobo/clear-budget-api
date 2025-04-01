@@ -6,7 +6,6 @@ using CategoriesService.Services;
 using CategoriesService.Services.Impl;
 using FluentAssertions;
 using Moq;
-using Org.BouncyCastle.Crypto;
 using Xunit;
 
 namespace CategoriesService.Tests

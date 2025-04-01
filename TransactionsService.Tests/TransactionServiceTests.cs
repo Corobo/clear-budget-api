@@ -5,7 +5,6 @@ using TransactionsService.Models.DTO;
 using TransactionsService.Models.Enums;
 using TransactionsService.Repositories;
 using TransactionsService.Services.Impl;
-using Xunit;
 
 namespace TransactionsService.Tests.Services
 {

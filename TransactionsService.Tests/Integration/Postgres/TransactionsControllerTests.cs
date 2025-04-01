@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Net.Http.Json;
 using TransactionsService.Models.DTO;
-using Xunit;
 
 namespace TransactionsService.Tests.Integration.Postgres
 {

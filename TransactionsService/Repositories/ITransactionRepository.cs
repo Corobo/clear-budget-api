@@ -1,5 +1,4 @@
 ﻿using TransactionsService.Models.DB;
-using TransactionsService.Models.DTO;
 
 namespace TransactionsService.Repositories
 {

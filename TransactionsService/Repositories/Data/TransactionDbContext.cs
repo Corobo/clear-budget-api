@@ -1,7 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
-using System.Reflection.Emit;
 using TransactionsService.Models.DB;
 
 namespace TransactionsService.Repositories.Data

@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TransactionsService.Repositories.Data;
-using Testcontainers.PostgreSql;
-using TransactionsService.Models.DB;
 using Microsoft.Extensions.Configuration;
-using Xunit;
+using Testcontainers.PostgreSql;
 using TransactionsService.Data;
+using TransactionsService.Repositories.Data;
 
 namespace TransactionsService.Tests.Integration.Postgres
 {

@@ -1,6 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using CategoriesService.Models.DB;
-using Microsoft.Extensions.Configuration;
+﻿using CategoriesService.Models.DB;
+using Microsoft.EntityFrameworkCore;
 
 namespace CategoriesService.Repositories.Data;
 

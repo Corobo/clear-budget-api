@@ -1,10 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CategoriesService.Data;
 using CategoriesService.Repositories.Data;
-using Testcontainers.PostgreSql;
-using CategoriesService.Models.DB;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Testcontainers.PostgreSql;
 using Xunit;
-using CategoriesService.Data;
 
 namespace CategoriesService.Tests.Integration.Postgres
 {

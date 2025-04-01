@@ -1,13 +1,13 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using CategoriesService.Repositories.Impl;
-using CategoriesService.Repositories;
-using CategoriesService.Services.Impl;
-using CategoriesService.Services;
-using CategoriesService.Repositories.Data;
 using CategoriesService.Data;
+using CategoriesService.Repositories;
+using CategoriesService.Repositories.Data;
+using CategoriesService.Repositories.Impl;
+using CategoriesService.Services;
+using CategoriesService.Services.Impl;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -109,7 +109,7 @@ using (var scope = app.Services.CreateScope())
         db.Database.Migrate();       // Recreate schema
         SeedData.Initialize(db);
     }
-    else if(!app.Environment.IsDevelopment() && app.Environment.EnvironmentName != "Testing")
+    else if (!app.Environment.IsDevelopment() && app.Environment.EnvironmentName != "Testing")
     {
         db.Database.Migrate();       // Safe update
         if (app.Environment.IsDevelopment())

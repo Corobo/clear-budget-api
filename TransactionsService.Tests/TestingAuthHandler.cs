@@ -1,8 +1,8 @@
-﻿using System.Security.Claims;
-using System.Text.Encodings.Web;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Security.Claims;
+using System.Text.Encodings.Web;
 
 public class TestingAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
@@ -17,7 +17,7 @@ public class TestingAuthHandler : AuthenticationHandler<AuthenticationSchemeOpti
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, "00000000-0000-0000-0000-000000000001"),
-            new Claim(ClaimTypes.Role, "clear-budget"), 
+            new Claim(ClaimTypes.Role, "clear-budget"),
             new Claim(ClaimTypes.Role, "clear-budget-admin"),
             new Claim("sub", "00000000-0000-0000-0000-000000000001")
         };

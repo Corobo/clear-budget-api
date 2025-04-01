@@ -1,10 +1,10 @@
-﻿using FluentAssertions;
+﻿using CategoriesService.Models.DTO;
+using FluentAssertions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
-using System.Net.Http.Json;
 using System.Net;
+using System.Net.Http.Json;
 using Xunit;
-using CategoriesService.Models.DTO;
 
 namespace CategoriesService.Tests.Integration.Postgres;
 

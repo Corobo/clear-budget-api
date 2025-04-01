@@ -1,13 +1,13 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using TransactionsService.Repositories.Impl;
-using TransactionsService.Repositories;
-using TransactionsService.Services.Impl;
-using TransactionsService.Services;
-using TransactionsService.Repositories.Data;
+using Microsoft.OpenApi.Models;
 using TransactionsService.Data;
+using TransactionsService.Repositories;
+using TransactionsService.Repositories.Data;
+using TransactionsService.Repositories.Impl;
+using TransactionsService.Services;
+using TransactionsService.Services.Impl;
 
 var builder = WebApplication.CreateBuilder(args);
 

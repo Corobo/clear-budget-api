@@ -1,5 +1,4 @@
 ﻿using TransactionsService.Models.DB;
-using TransactionsService.Data;
 using TransactionsService.Models.Enums;
 using TransactionsService.Repositories.Data;
 
