@@ -9,43 +9,44 @@ using Moq;
 using Org.BouncyCastle.Crypto;
 using Xunit;
 
-namespace CategoriesService.Tests;
-
-public class CategoryServiceTests
+namespace CategoriesService.Tests
 {
-    private readonly Mock<ICategoryRepository> _repoMock = new();
-    private readonly Mock<IMapper> _mapperMock = new();
-    private readonly ICategoryService _service;
-
-    public CategoryServiceTests()
+    public class CategoryServiceTests
     {
-        _service = new CategoryService(_repoMock.Object, _mapperMock.Object);
-    }
+        private readonly Mock<ICategoryRepository> _repoMock = new();
+        private readonly Mock<IMapper> _mapperMock = new();
+        private readonly ICategoryService _service;
 
-    [Fact]
-    public async Task GetAdminCategoriesAsync_ShouldReturnMappedDtos()
-    {
-        // Arrange
-        var categories = new List<Category>
+        public CategoryServiceTests()
+        {
+            _service = new CategoryService(_repoMock.Object, _mapperMock.Object);
+        }
+
+        [Fact]
+        public async Task GetAdminCategoriesAsync_ShouldReturnMappedDtos()
+        {
+            // Arrange
+            var categories = new List<Category>
         {
             new() { Id = Guid.NewGuid(), Name = "Food", Color = "#ff0000" }
         };
 
-        var categoryDtos = new List<CategoryDTO>
+            var categoryDtos = new List<CategoryDTO>
         {
             new(categories[0].Id, "Food", "#ff0000")
         };
 
-        _repoMock.Setup(r => r.GetAdminCategoriesAsync())
-            .ReturnsAsync(categories);
+            _repoMock.Setup(r => r.GetAdminCategoriesAsync())
+                .ReturnsAsync(categories);
 
-        _mapperMock.Setup(m => m.Map<CategoryDTO>(It.IsAny<Category>()))
-            .Returns<Category>(c => new CategoryDTO(c.Id, c.Name, c.Color));
+            _mapperMock.Setup(m => m.Map<CategoryDTO>(It.IsAny<Category>()))
+                .Returns<Category>(c => new CategoryDTO(c.Id, c.Name, c.Color));
 
-        // Act
-        var result = await _service.GetAdminCategoriesAsync();
+            // Act
+            var result = await _service.GetAdminCategoriesAsync();
 
-        // Assert
-        result.Should().BeEquivalentTo(categoryDtos);
+            // Assert
+            result.Should().BeEquivalentTo(categoryDtos);
+        }
     }
 }

@@ -21,7 +21,7 @@ public class CategoriesControllerTests : IClassFixture<PostgreSqlContainerFixtur
 
     private static HttpClient CreateAuthenticatedClient(PostgreSqlContainerFixture fixture)
     {
-        var factory = new PostgresWebAppFactory(fixture.ConnectionString);
+        var factory = new WebAppFactory(fixture.ConnectionString);
 
 
         return factory.WithWebHostBuilder(builder =>

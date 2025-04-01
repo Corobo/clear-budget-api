@@ -6,52 +6,53 @@ using Microsoft.Extensions.Configuration;
 using Xunit;
 using CategoriesService.Data;
 
-namespace CategoriesService.Tests.Integration.Postgres;
-
-public class PostgreSqlContainerFixture : IAsyncLifetime
+namespace CategoriesService.Tests.Integration.Postgres
 {
-    public PostgreSqlContainer Container { get; private set; } = null!;
-
-    public string ConnectionString => Container.GetConnectionString();
-
-    public async Task InitializeAsync()
+    public class PostgreSqlContainerFixture : IAsyncLifetime
     {
+        public PostgreSqlContainer Container { get; private set; } = null!;
 
-        PostgreSqlBuilder builder = new PostgreSqlBuilder()
-            .WithDatabase("testdb")
-            .WithUsername("testuser")
-            .WithPassword("testpass")
-            .WithPortBinding(5432)
-            .WithCleanUp(true)
-            .WithImage("postgres:17");
+        public string ConnectionString => Container.GetConnectionString();
 
-        Container = builder.Build();
+        public async Task InitializeAsync()
+        {
 
-        var config = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json")
-            .AddJsonFile("appsettings.Testing.json", optional: true)
-            .AddEnvironmentVariables()
-            .Build();
+            PostgreSqlBuilder builder = new PostgreSqlBuilder()
+                .WithDatabase("testdb")
+                .WithUsername("testuser")
+                .WithPassword("testpass")
+                .WithPortBinding(5432)
+                .WithCleanUp(true)
+                .WithImage("postgres:17");
 
-        await Container.StartAsync();
+            Container = builder.Build();
 
-        using var context = new CategoriesDbContext(
-            new DbContextOptionsBuilder<CategoriesDbContext>()
-                .UseNpgsql(Container.GetConnectionString())
-                .Options,config);
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appsettings.Testing.json", optional: true)
+                .AddEnvironmentVariables()
+                .Build();
 
-        EnsureDbCreatedAndMigrated(context);
+            await Container.StartAsync();
 
-    }
+            using var context = new CategoriesDbContext(
+                new DbContextOptionsBuilder<CategoriesDbContext>()
+                    .UseNpgsql(Container.GetConnectionString())
+                    .Options, config);
 
-    public void EnsureDbCreatedAndMigrated(CategoriesDbContext dbContext)
-    {
-        dbContext.Database.Migrate();
-        SeedData.InitializeTest(dbContext);
-    }
+            EnsureDbCreatedAndMigrated(context);
 
-    public async Task DisposeAsync()
-    {
-        await Container.StopAsync();
+        }
+
+        public void EnsureDbCreatedAndMigrated(CategoriesDbContext dbContext)
+        {
+            dbContext.Database.Migrate();
+            SeedData.InitializeTest(dbContext);
+        }
+
+        public async Task DisposeAsync()
+        {
+            await Container.StopAsync();
+        }
     }
 }
