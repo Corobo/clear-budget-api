@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UsersService\UsersService.csproj" />
+    <ProjectReference Include="..\ReportingService\ReportingService.csproj" />
   </ItemGroup>
 
   <ItemGroup>
