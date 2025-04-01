@@ -2,12 +2,16 @@
 using TransactionsService.Models.DB;
 using TransactionsService.Models.DTO;
 
-namespace CategoriesService.Profiles;
-
-public class TransactionProfile : Profile
+namespace TransactionsService.Profiles
 {
-    public TransactionProfile()
+    public class TransactionProfile : Profile
     {
-        CreateMap<Transaction, TransactionDTO>();
+        public TransactionProfile()
+        {
+            CreateMap<Transaction, TransactionDTO>().ReverseMap();
+            CreateMap<CreateTransactionDTO, Transaction>();
+            CreateMap<UpdateTransactionDTO, Transaction>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+        }
     }
 }

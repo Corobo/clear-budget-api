@@ -1,4 +1,6 @@
-﻿namespace TransactionsService.Models.DB
+﻿using TransactionsService.Models.Enums;
+
+namespace TransactionsService.Models.DB
 {
     public class Transaction
     {

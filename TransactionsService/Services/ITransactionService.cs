@@ -2,7 +2,7 @@
 
 namespace TransactionsService.Services
 {
-    public interface ITransactionsService
+    public interface ITransactionService
     {
         Task<IEnumerable<TransactionDTO>> GetAllByUserIdAsync(string userId);
         Task<TransactionDTO?> GetByIdAsync(Guid id, string userId);
