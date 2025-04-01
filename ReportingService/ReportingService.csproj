@@ -23,15 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
     <Folder Include="Data\" />
-    <Folder Include="Models\DB\" />
-    <Folder Include="Models\DTO\" />
-    <Folder Include="Profiles\" />
-    <Folder Include="Repositories\Data\" />
-    <Folder Include="Repositories\Impl\" />
-    <Folder Include="Repositories\Migrations\" />
-    <Folder Include="Services\Impl\" />
   </ItemGroup>
 
 </Project>
