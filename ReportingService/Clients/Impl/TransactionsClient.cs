@@ -12,12 +12,25 @@ namespace ReportingService.Clients.Impl
             _httpClient = httpClient;
         }
 
-        public async Task<IEnumerable<TransactionDTO>> GetUserTransactionsAsync(string userId)
+        public async Task<IEnumerable<TransactionDTO>> GetUserTransactionsAsync(string userId,
+            CancellationToken cancellationToken = default)
         {
-            var response = await _httpClient.GetAsync("/api/transactions");
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<IEnumerable<TransactionDTO>>()
-                   ?? Enumerable.Empty<TransactionDTO>();
+            var requestUri = $"/api/transactions?userId={userId}"; // Incluye el userId en la URI si es necesario
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+
+            try
+            {
+                using (var response = await _httpClient.SendAsync(request, cancellationToken))
+                {
+                    response.EnsureSuccessStatusCode();
+                    return await response.Content.ReadFromJsonAsync<IEnumerable<TransactionDTO>>(cancellationToken)
+                               ?? Enumerable.Empty<TransactionDTO>();
+                }
+            }
+            catch (TaskCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return Enumerable.Empty<TransactionDTO>();
+            }
         }
     }
 

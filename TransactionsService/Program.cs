@@ -4,12 +4,16 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Linq;
 using System.Security.Claims;
+using TransactionsService.Clients.Impl;
+using TransactionsService.Clients;
 using TransactionsService.Data;
 using TransactionsService.Repositories;
 using TransactionsService.Repositories.Data;
 using TransactionsService.Repositories.Impl;
 using TransactionsService.Services;
 using TransactionsService.Services.Impl;
+using Polly.Retry;
+using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +34,7 @@ if (!builder.Environment.IsEnvironment("Testing"))
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddSingleton<ICategoryCache, CategoryCache>();
 
 // === Controllers ===
 builder.Services.AddControllers()
@@ -116,6 +121,11 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+// === Clients ===
+builder.Services.AddHttpClient<ICategoriesClient, CategoriesClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Services:Categories"]);
+});
 
 var app = builder.Build();
 
