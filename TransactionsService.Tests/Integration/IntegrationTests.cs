@@ -1,28 +1,40 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using System.Net;
 using System.Net.Http.Json;
 using TransactionsService.Models.DTO;
+using TransactionsService.Tests.Integration.Postgres;
+using TransactionsService.Tests.Integration.RabbitMQ;
 
-namespace TransactionsService.Tests.Integration.Postgres
+namespace TransactionsService.Tests.Integration
 {
-    public class TransactionsControllerTests : IClassFixture<PostgreSqlContainerFixture>
+    public class IntegrationTests : IClassFixture<PostgreSqlContainerFixture>, IClassFixture<RabbitMqContainerFixture>
     {
-        private readonly HttpClient _client;
 
-        public TransactionsControllerTests(PostgreSqlContainerFixture fixture)
+        private readonly HttpClient _client;
+        private readonly RabbitMqContainerFixture _rabbitFixture;
+        private readonly PostgreSqlContainerFixture _postgresFixture;
+
+        public IntegrationTests(PostgreSqlContainerFixture fixture, RabbitMqContainerFixture rabbitMqContainerFixture)
         {
-            _client = CreateAuthenticatedClient(fixture);
+            _client = CreateAuthenticatedClient(fixture, rabbitMqContainerFixture);
+            _rabbitFixture = rabbitMqContainerFixture;
+            _postgresFixture = fixture;
         }
 
-        private static HttpClient CreateAuthenticatedClient(PostgreSqlContainerFixture fixture)
+        private static HttpClient CreateAuthenticatedClient(PostgreSqlContainerFixture fixture, RabbitMqContainerFixture rabbitMqContainerFixture)
         {
             var factory = new WebAppFactory(fixture.ConnectionString);
 
             return factory.WithWebHostBuilder(builder =>
             {
                 builder.UseSetting("ConnectionStrings:DefaultConnection", fixture.ConnectionString);
+                builder.UseSetting("RabbitMQ:Host", rabbitMqContainerFixture.Hostname);
+                builder.UseSetting("RabbitMQ:Port", rabbitMqContainerFixture.Port.ToString());
+                builder.UseSetting("RabbitMQ:User", rabbitMqContainerFixture.Username);
+                builder.UseSetting("RabbitMQ:Password", rabbitMqContainerFixture.Password);
                 builder.ConfigureServices(services =>
                 {
                     services.PostConfigureAll<AuthenticationOptions>(opts =>
@@ -30,6 +42,7 @@ namespace TransactionsService.Tests.Integration.Postgres
                         opts.DefaultAuthenticateScheme = "Test";
                         opts.DefaultChallengeScheme = "Test";
                     });
+                    services.AddSingleton<Serilog.ILogger>(new LoggerConfiguration().CreateLogger());
                 });
             }).CreateClient();
         }

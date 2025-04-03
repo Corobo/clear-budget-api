@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using ReportingService.Clients.Impl;
-using ReportingService.Clients;
-using ReportingService.Services;
 using Newtonsoft.Json.Linq;
+using ReportingService.Clients;
+using ReportingService.Clients.Impl;
+using ReportingService.Services;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);

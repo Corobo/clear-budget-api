@@ -51,6 +51,7 @@ namespace TransactionsService.Tests.Integration.Postgres
         public async Task DisposeAsync()
         {
             await Container.StopAsync();
+            await Task.Delay(TimeSpan.FromSeconds(15));
         }
     }
 }

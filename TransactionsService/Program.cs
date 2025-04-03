@@ -1,10 +1,22 @@
+using Messaging.Configuration;
+using Messaging.Connection;
+using Messaging.EventBus;
+using Messaging.Events;
+using Messaging.Factories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Linq;
+using RabbitMQ.Client;
+using Serilog;
 using System.Security.Claims;
+using TransactionsService.Clients;
+using TransactionsService.Clients.Impl;
 using TransactionsService.Data;
+using TransactionsService.Messaging.Consumers;
+using TransactionsService.Messaging.Subscriptions;
 using TransactionsService.Repositories;
 using TransactionsService.Repositories.Data;
 using TransactionsService.Repositories.Impl;
@@ -18,6 +30,14 @@ var config = builder.Configuration;
 var jwtConfig = config.GetSection("Jwt");
 var corsOrigins = config.GetSection("Cors:AllowedOrigins").Get<string[]>();
 
+// === RabbitMQ ===
+builder.Services.Configure<RabbitMQOptions>(
+    builder.Configuration.GetSection(RabbitMQOptions.ConfigurationSectionName));
+builder.Services.AddSingleton<RabbitMqConnectionAccessor>();
+builder.Services.AddSingleton<RabbitMqConnectionFactory>();
+builder.Services.AddHostedService<RabbitMqConnectionInitializer>();
+
+
 // === EF Core ===
 if (!builder.Environment.IsEnvironment("Testing"))
 {
@@ -30,6 +50,12 @@ if (!builder.Environment.IsEnvironment("Testing"))
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddSingleton<ICategoryCache, CategoryCache>();
+builder.Services.AddSingleton<IEventBusConsumer<CategoryEvent>, CategoryEventConsumer>();
+builder.Services.AddHostedService<CategorySubscriptionService>();
+builder.Services.AddSingleton<Serilog.ILogger>(new LoggerConfiguration().CreateLogger());
+builder.Services.AddTransient<ServiceAuthHandler>();
+
 
 // === Controllers ===
 builder.Services.AddControllers()
@@ -115,6 +141,16 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+
+// === Clients ===
+builder.Services.AddHttpClient<ICategoriesClient, CategoriesClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Services:Categories"]);
+}).AddHttpMessageHandler<ServiceAuthHandler>();
+builder.Services.AddHttpClient<IAuthTokenClient, AuthTokenClient>();
+
+
+
 
 
 var app = builder.Build();

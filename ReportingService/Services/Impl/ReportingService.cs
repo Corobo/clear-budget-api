@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
+using Polly;
+using Polly.Retry;
 using ReportingService.Clients;
 using ReportingService.Models.DTO;
 
@@ -24,7 +26,22 @@ namespace ReportingService.Services.Impl
                 return cachedReport;
             }
 
-            var transactions = await _transactionsClient.GetUserTransactionsAsync(userId);
+            // === Polly ===
+            var cancellationTokenSource = new CancellationTokenSource();
+            CancellationToken cancellationToken = cancellationTokenSource.Token;
+            ResiliencePipeline pipeline = new ResiliencePipelineBuilder()
+                .AddRetry(new RetryStrategyOptions
+                {
+                    ShouldHandle = new PredicateBuilder().Handle<InvalidOperationException>(),
+                    MaxRetryAttempts = 5,
+                    Delay = TimeSpan.FromSeconds(2),
+                    BackoffType = DelayBackoffType.Exponential,
+                    UseJitter = true,
+                })
+                .Build();
+
+            var transactions = await pipeline.ExecuteAsync(async ct =>
+            await _transactionsClient.GetUserTransactionsAsync(userId, ct), cancellationToken);
 
             var income = transactions.Where(t => t.Type == 1).Sum(t => t.Amount);
             var expenses = transactions.Where(t => t.Type == 0).Sum(t => t.Amount);

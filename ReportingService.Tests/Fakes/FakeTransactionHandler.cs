@@ -1,9 +1,6 @@
-﻿using System.Net;
-using System.Net.Http;
+﻿using ReportingService.Models.DTO;
+using System.Net;
 using System.Net.Http.Json;
-using System.Text.Json;
-using ReportingService.Clients.Impl;
-using ReportingService.Models.DTO;
 
 namespace ReportingService.Tests.Fakes
 {

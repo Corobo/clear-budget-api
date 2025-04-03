@@ -1,11 +1,7 @@
 ﻿using FluentAssertions;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.DependencyInjection;
+using ReportingService.Models.DTO;
 using System.Net;
 using System.Net.Http.Json;
-using ReportingService.Models.DTO;
-using ReportingService.Tests.Fakes;
-using Xunit;
 using TransactionsService.Tests.Integration.Postgres;
 
 namespace ReportingService.Tests.Integration
@@ -23,7 +19,7 @@ namespace ReportingService.Tests.Integration
         {
             var factory = new WebAppFactory();
             return factory.CreateClient();
-            
+
         }
 
         [Fact]

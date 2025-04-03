@@ -6,6 +6,7 @@ namespace CategoriesService.Services
     {
         Task<IEnumerable<CategoryDTO>> GetMergedCategoriesAsync(Guid userId);
         Task<IEnumerable<CategoryDTO>> GetAdminCategoriesAsync();
+        Task<IEnumerable<Guid>> GetAllCategories();
         Task<CategoryDTO> CreateUserCategoryAsync(Guid userId, CategoryCreateDTO dto);
         Task<CategoryDTO> CreateAdminCategoryAsync(CategoryCreateDTO dto);
         Task<bool> UpdateCategoryColorAsync(Guid id, Guid userId, CategoryUpdateDTO dto);

@@ -16,7 +16,6 @@ namespace ReportingService.Tests.Services
         {
             _transactionsClientMock = new Mock<ITransactionsClient>();
 
-            // Configurar cache real pero controlada
             _cache = new MemoryCache(new MemoryCacheOptions());
             _service = new ReportingService.Services.Impl.ReportingService(_transactionsClientMock.Object, _cache);
         }
@@ -32,8 +31,10 @@ namespace ReportingService.Tests.Services
                 new() { Type = 0, Amount = 200, CategoryId = Guid.NewGuid(), Description = "Food", Date = DateTime.UtcNow } // expense
             };
 
-            _transactionsClientMock.Setup(c => c.GetUserTransactionsAsync(userId))
+            _transactionsClientMock
+                .Setup(c => c.GetUserTransactionsAsync(userId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(transactions);
+
 
             // Act
             var result = await _service.GetDashboardReportAsync(userId);
@@ -53,13 +54,15 @@ namespace ReportingService.Tests.Services
             var userId = "user-2";
             var report = new DashboardReportDTO { TotalIncome = 1234 };
             _cache.Set($"report:{userId}", report);
+            var cancellationTokenSource = new CancellationTokenSource();
+            CancellationToken cancellationToken = cancellationTokenSource.Token;
 
             // Act
             var result = await _service.GetDashboardReportAsync(userId);
 
             // Assert
             result.Should().BeSameAs(report);
-            _transactionsClientMock.Verify(c => c.GetUserTransactionsAsync(It.IsAny<string>()), Times.Never);
+            _transactionsClientMock.Verify(c => c.GetUserTransactionsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
@@ -74,8 +77,11 @@ namespace ReportingService.Tests.Services
 
             _cache.Set($"report:{userId}", new DashboardReportDTO { TotalIncome = 999 });
 
-            _transactionsClientMock.Setup(c => c.GetUserTransactionsAsync(userId))
+
+            _transactionsClientMock
+                .Setup(c => c.GetUserTransactionsAsync(userId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(transactions);
+
 
             // Act
             var result = await _service.GetDashboardReportAsync(userId, forceRefresh: true);

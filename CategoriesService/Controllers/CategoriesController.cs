@@ -25,6 +25,14 @@ public class CategoriesController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("ids")]
+    [Authorize(Roles = "clear-budget-m2m")]
+    public async Task<IActionResult> GetAllCategories()
+    {
+        var result = await _service.GetAllCategories();
+        return Ok(result);
+    }
+
     [HttpGet("admin")]
     [Authorize(Roles = "clear-budget-admin")]
     public async Task<IActionResult> GetAdminCategories()
