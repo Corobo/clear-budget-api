@@ -27,6 +27,12 @@ namespace CategoriesService.Repositories.Impl
                 .ToListAsync();
         }
 
+        public Task<List<Category>> GetAllCategoriesAsync()
+        {
+            return _db.Categories
+                .ToListAsync();
+        }
+
         public Task<Category?> GetByIdAsync(Guid id)
         {
             return _db.Categories.FirstOrDefaultAsync(c => c.Id == id);

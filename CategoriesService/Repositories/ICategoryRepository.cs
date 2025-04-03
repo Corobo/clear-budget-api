@@ -6,6 +6,7 @@ namespace CategoriesService.Repositories
     {
         Task<List<Category>> GetUserCategoriesAsync(Guid userId);
         Task<List<Category>> GetAdminCategoriesAsync();
+        Task<List<Category>> GetAllCategoriesAsync();
         Task<Category?> GetByIdAsync(Guid id);
         Task AddAsync(Category category);
         Task DeleteAsync(Category category);

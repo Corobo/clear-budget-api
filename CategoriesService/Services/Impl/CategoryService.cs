@@ -40,6 +40,13 @@ namespace CategoriesService.Services.Impl
             return merged.Select(_mapper.Map<CategoryDTO>);
         }
 
+        public async Task<IEnumerable<Guid>> GetAllCategories()
+        {
+            var categories = await _repo.GetAllCategoriesAsync();
+
+            return categories.Select(x=> x.Id);
+        }
+
         public async Task<IEnumerable<CategoryDTO>> GetAdminCategoriesAsync()
         {
             var categories = await _repo.GetAdminCategoriesAsync();

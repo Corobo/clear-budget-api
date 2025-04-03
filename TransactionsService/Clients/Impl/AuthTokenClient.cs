@@ -2,28 +2,15 @@
 
 namespace TransactionsService.Clients.Impl
 {
-    public class CategoriesClient : ICategoriesClient
+    public class AuthTokenClient : IAuthTokenClient
     {
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _config;
 
-        public CategoriesClient(HttpClient httpClient, IConfiguration configuration)
+        public AuthTokenClient(HttpClient httpClient, IConfiguration config)
         {
             _httpClient = httpClient;
-            _config = configuration;
-        }
-
-        public async Task<IEnumerable<Guid>> GetAllCategoryIdsAsync(CancellationToken cancellationToken = default)
-        {
-            try
-            {
-                var result = await _httpClient.GetFromJsonAsync<List<Guid>>("/api/categories/ids", cancellationToken);
-                return result ?? new List<Guid>();
-            }
-            catch (TaskCanceledException) when (cancellationToken.IsCancellationRequested)
-            {
-                return Enumerable.Empty<Guid>();
-            }
+            _config = config;
         }
 
         public async Task<string> GetAccessTokenAsync()

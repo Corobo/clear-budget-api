@@ -3,9 +3,12 @@ using Messaging.EventBus;
 using Messaging.Events;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Linq;
+using RabbitMQ.Client;
+using Serilog;
 using System.Security.Claims;
 using TransactionsService.Clients;
 using TransactionsService.Clients.Impl;
@@ -28,6 +31,23 @@ var corsOrigins = config.GetSection("Cors:AllowedOrigins").Get<string[]>();
 builder.Services.Configure<RabbitMQOptions>(
     builder.Configuration.GetSection(RabbitMQOptions.ConfigurationSectionName));
 
+builder.Services.AddSingleton<IConnection>(provider =>
+{
+    var options = provider.GetRequiredService<IOptions<RabbitMQOptions>>().Value;
+
+    var factory = new ConnectionFactory
+    {
+        HostName = options.Host,
+        Port = options.Port ?? 5672,
+        UserName = options.User,
+        Password = options.Password,
+        VirtualHost = options.VirtualHost,
+    };
+
+    return factory.CreateConnectionAsync().Result;
+});
+
+
 
 // === EF Core ===
 if (!builder.Environment.IsEnvironment("Testing"))
@@ -44,6 +64,8 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddSingleton<ICategoryCache, CategoryCache>();
 builder.Services.AddSingleton<IEventBusConsumer<CategoryEvent>, CategoryEventConsumer>();
 builder.Services.AddHostedService<CategorySubscriptionService>();
+builder.Services.AddSingleton<Serilog.ILogger>(new LoggerConfiguration().CreateLogger());
+builder.Services.AddTransient<ServiceAuthHandler>();
 
 
 // === Controllers ===
@@ -135,7 +157,12 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddHttpClient<ICategoriesClient, CategoriesClient>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Services:Categories"]);
-});
+}).AddHttpMessageHandler<ServiceAuthHandler>();
+builder.Services.AddHttpClient<IAuthTokenClient, AuthTokenClient>();
+
+
+
+
 
 var app = builder.Build();
 
