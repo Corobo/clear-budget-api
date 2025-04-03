@@ -1,6 +1,7 @@
 ﻿using Messaging.Background;
 using Messaging.Configuration;
 using Messaging.Events;
+using Messaging.Factories;
 using Microsoft.Extensions.Options;
 using ILogger = Serilog.ILogger;
 
@@ -11,8 +12,9 @@ namespace TransactionsService.Messaging.Subscriptions
         public CategorySubscriptionService(
             ILogger logger,
             IOptions<RabbitMQOptions> options,
-            IServiceScopeFactory scopeFactory)
-            : base(logger, options, scopeFactory)
+            IServiceScopeFactory scopeFactory,
+            RabbitMqConnectionFactory rabbitMqConnectionFactory)
+            : base(logger, options, scopeFactory, rabbitMqConnectionFactory)
         {
             QueueName = options.Value.QueueNames["Category"];
         }

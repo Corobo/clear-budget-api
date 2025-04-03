@@ -1,21 +1,25 @@
 ﻿using RabbitMQ.Client;
 using System.Text;
 using System.Text.Json;
+using Messaging.Connection;
 
 namespace Messaging.EventBus.Impl
 {
     public class EventBusProducer<T> : IEventBusProducer<T>
     {
-        private readonly IConnection _connection;
+        private readonly RabbitMqConnectionAccessor _accessor;
         private IChannel? _channel;
 
-        public EventBusProducer(IConnection connection)
+        public EventBusProducer(RabbitMqConnectionAccessor accessor)
         {
-            _connection = connection;
+            _accessor = accessor;
         }
 
         public async Task PublishAsync(T @event, string exchange, string routingKey = "")
         {
+            if (_accessor.Connection is null)
+                throw new InvalidOperationException("RabbitMQ connection not initialized.");
+
             var message = JsonSerializer.Serialize(@event);
             var body = Encoding.UTF8.GetBytes(message);
             var props = new BasicProperties
@@ -24,24 +28,15 @@ namespace Messaging.EventBus.Impl
                 DeliveryMode = DeliveryModes.Persistent
             };
 
-            _channel = await GetOrCreateChannelAsync();
+            _channel ??= await _accessor.Connection.CreateChannelAsync().ConfigureAwait(false);
 
             await _channel.BasicPublishAsync(
                 exchange,
                 routingKey,
-                false,
+                mandatory: false,
                 props,
-                body);
-
-        }
-
-        private async Task<IChannel> GetOrCreateChannelAsync()
-        {
-            if (_channel is not null)
-                return _channel;
-
-            _channel = await _connection.CreateChannelAsync().ConfigureAwait(false);
-            return _channel;
+                body
+            );
         }
     }
 }

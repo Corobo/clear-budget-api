@@ -1,6 +1,8 @@
 using Messaging.Configuration;
+using Messaging.Connection;
 using Messaging.EventBus;
 using Messaging.Events;
+using Messaging.Factories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -28,25 +30,12 @@ var config = builder.Configuration;
 var jwtConfig = config.GetSection("Jwt");
 var corsOrigins = config.GetSection("Cors:AllowedOrigins").Get<string[]>();
 
+// === RabbitMQ ===
 builder.Services.Configure<RabbitMQOptions>(
     builder.Configuration.GetSection(RabbitMQOptions.ConfigurationSectionName));
-
-builder.Services.AddSingleton<IConnection>(provider =>
-{
-    var options = provider.GetRequiredService<IOptions<RabbitMQOptions>>().Value;
-
-    var factory = new ConnectionFactory
-    {
-        HostName = options.Host,
-        Port = options.Port ?? 5672,
-        UserName = options.User,
-        Password = options.Password,
-        VirtualHost = options.VirtualHost,
-    };
-
-    return factory.CreateConnectionAsync().Result;
-});
-
+builder.Services.AddSingleton<RabbitMqConnectionAccessor>();
+builder.Services.AddSingleton<RabbitMqConnectionFactory>();
+builder.Services.AddHostedService<RabbitMqConnectionInitializer>();
 
 
 // === EF Core ===

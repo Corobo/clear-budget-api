@@ -5,6 +5,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
+using Serilog;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text;

@@ -5,9 +5,11 @@ using CategoriesService.Repositories.Impl;
 using CategoriesService.Services;
 using CategoriesService.Services.Impl;
 using Messaging.Configuration;
+using Messaging.Connection;
 using Messaging.EventBus;
 using Messaging.EventBus.Impl;
 using Messaging.Events;
+using Messaging.Factories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -15,6 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
+using Serilog;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,24 +27,13 @@ var config = builder.Configuration;
 var jwtConfig = config.GetSection("Jwt");
 var corsOrigins = config.GetSection("Cors:AllowedOrigins").Get<string[]>();
 
+// === RabbitMQ ===
 builder.Services.Configure<RabbitMQOptions>(
     builder.Configuration.GetSection(RabbitMQOptions.ConfigurationSectionName));
+builder.Services.AddSingleton<RabbitMqConnectionAccessor>();
+builder.Services.AddSingleton<RabbitMqConnectionFactory>();
+builder.Services.AddHostedService<RabbitMqConnectionInitializer>();
 
-builder.Services.AddSingleton<IConnection>(provider =>
-{
-    var options = provider.GetRequiredService<IOptions<RabbitMQOptions>>().Value;
-
-    var factory = new ConnectionFactory
-    {
-        HostName = options.Host,
-        Port = options.Port ?? 5672,
-        UserName = options.User,
-        Password = options.Password,
-        VirtualHost = options.VirtualHost,
-    };
-
-    return factory.CreateConnectionAsync().Result;
-});
 
 
 // === EF Core ===
@@ -57,6 +49,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddSingleton<IEventBusProducer<CategoryEvent>, EventBusProducer<CategoryEvent>>();
+builder.Services.AddSingleton<Serilog.ILogger>(new LoggerConfiguration().CreateLogger());
 
 
 // === Controllers ===
