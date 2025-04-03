@@ -1,5 +1,4 @@
 ﻿using ReportingService.Models.DTO;
-using System.Net.Http.Json;
 
 namespace ReportingService.Clients.Impl
 {

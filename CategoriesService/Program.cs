@@ -4,11 +4,17 @@ using CategoriesService.Repositories.Data;
 using CategoriesService.Repositories.Impl;
 using CategoriesService.Services;
 using CategoriesService.Services.Impl;
+using Messaging.Configuration;
+using Messaging.EventBus;
+using Messaging.EventBus.Impl;
+using Messaging.Events;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Linq;
+using RabbitMQ.Client;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +23,26 @@ var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 var jwtConfig = config.GetSection("Jwt");
 var corsOrigins = config.GetSection("Cors:AllowedOrigins").Get<string[]>();
+
+builder.Services.Configure<RabbitMQOptions>(
+    builder.Configuration.GetSection(RabbitMQOptions.ConfigurationSectionName));
+
+builder.Services.AddSingleton<IConnection>(provider =>
+{
+    var options = provider.GetRequiredService<IOptions<RabbitMQOptions>>().Value;
+
+    var factory = new ConnectionFactory
+    {
+        HostName = options.Host,
+        Port = options.Port ?? 5672,
+        UserName = options.User,
+        Password = options.Password,
+        VirtualHost = options.VirtualHost,
+    };
+
+    return factory.CreateConnectionAsync().Result;
+});
+
 
 // === EF Core ===
 if (!builder.Environment.IsEnvironment("Testing"))
@@ -30,6 +56,8 @@ if (!builder.Environment.IsEnvironment("Testing"))
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddSingleton<IEventBusProducer<CategoryEvent>, EventBusProducer<CategoryEvent>>();
+
 
 // === Controllers ===
 builder.Services.AddControllers()

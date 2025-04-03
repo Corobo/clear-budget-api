@@ -1,8 +1,7 @@
-﻿using Polly.Retry;
-using Polly;
+﻿using Polly;
+using Polly.Retry;
 using System.Collections.Concurrent;
 using TransactionsService.Clients;
-using System.Threading;
 
 namespace TransactionsService.Services.Impl
 {
@@ -33,7 +32,7 @@ namespace TransactionsService.Services.Impl
                 })
                 .Build();
 
-            var ids = await pipeline.ExecuteAsync(async ct => 
+            var ids = await pipeline.ExecuteAsync(async ct =>
             await _categoriesClient.GetAllCategoryIdsAsync(ct), cancellationToken);
             _categories.Clear();
 

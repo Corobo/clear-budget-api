@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CategoriesService.Tests.Integration.Postgres
+namespace CategoriesService.Tests.Integration
 {
     public class WebAppFactory : WebApplicationFactory<Program>
     {

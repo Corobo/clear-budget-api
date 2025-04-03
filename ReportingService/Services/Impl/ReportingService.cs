@@ -41,7 +41,7 @@ namespace ReportingService.Services.Impl
                 .Build();
 
             var transactions = await pipeline.ExecuteAsync(async ct =>
-            await _transactionsClient.GetUserTransactionsAsync(userId,ct), cancellationToken);
+            await _transactionsClient.GetUserTransactionsAsync(userId, ct), cancellationToken);
 
             var income = transactions.Where(t => t.Type == 1).Sum(t => t.Amount);
             var expenses = transactions.Where(t => t.Type == 0).Sum(t => t.Amount);

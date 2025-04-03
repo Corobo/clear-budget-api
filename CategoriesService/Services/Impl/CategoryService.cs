@@ -2,6 +2,10 @@
 using global::CategoriesService.Models.DB;
 using global::CategoriesService.Models.DTO;
 using global::CategoriesService.Repositories;
+using Messaging.Configuration;
+using Messaging.EventBus;
+using Messaging.Events;
+using Microsoft.Extensions.Options;
 
 namespace CategoriesService.Services.Impl
 {
@@ -12,11 +16,16 @@ namespace CategoriesService.Services.Impl
     {
         private readonly ICategoryRepository _repo;
         private readonly IMapper _mapper;
+        private readonly IEventBusProducer<CategoryEvent> _eventProducer;
+        private readonly string _exchangeName;
 
-        public CategoryService(ICategoryRepository repo, IMapper mapper)
+        public CategoryService(ICategoryRepository repo, IMapper mapper, IEventBusProducer<CategoryEvent> eventProducer,
+            IOptions<RabbitMQOptions> options)
         {
             _repo = repo;
             _mapper = mapper;
+            _eventProducer = eventProducer;
+            _exchangeName = options.Value.ExchangeNames["Category"];
         }
 
         public async Task<IEnumerable<CategoryDTO>> GetMergedCategoriesAsync(Guid userId)
@@ -49,6 +58,15 @@ namespace CategoriesService.Services.Impl
 
             await _repo.AddAsync(category);
             await _repo.SaveChangesAsync();
+
+            await _eventProducer.PublishAsync(new CategoryEvent
+            {
+                EventType = "category.created",
+                CategoryId = category.Id,
+                UserId = category.UserId
+            }, _exchangeName);
+
+
             return _mapper.Map<CategoryDTO>(category);
         }
 
@@ -64,6 +82,13 @@ namespace CategoriesService.Services.Impl
 
             await _repo.AddAsync(category);
             await _repo.SaveChangesAsync();
+
+            await _eventProducer.PublishAsync(new CategoryEvent
+            {
+                EventType = "category.created",
+                CategoryId = category.Id,
+                UserId = null
+            }, _exchangeName);
 
             return _mapper.Map<CategoryDTO>(category);
         }
@@ -83,6 +108,14 @@ namespace CategoriesService.Services.Impl
             category.Color = dto.Color;
 
             await _repo.SaveChangesAsync();
+
+            await _eventProducer.PublishAsync(new CategoryEvent
+            {
+                EventType = "category.updated",
+                CategoryId = category.Id,
+                UserId = category.UserId
+            }, _exchangeName);
+
             return true;
         }
 
@@ -94,6 +127,15 @@ namespace CategoriesService.Services.Impl
 
             await _repo.DeleteAsync(category);
             await _repo.SaveChangesAsync();
+
+            await _eventProducer.PublishAsync(new CategoryEvent
+            {
+                EventType = "category.deleted",
+                CategoryId = category.Id,
+                UserId = category.UserId
+            }, _exchangeName);
+
+
             return true;
         }
 
@@ -105,6 +147,15 @@ namespace CategoriesService.Services.Impl
 
             await _repo.DeleteAsync(category);
             await _repo.SaveChangesAsync();
+
+            await _eventProducer.PublishAsync(new CategoryEvent
+            {
+                EventType = "category.deleted",
+                CategoryId = category.Id,
+                UserId = null
+            }, _exchangeName);
+
+
             return true;
         }
     }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using TransactionsService.Repositories.Data;
 
-namespace TransactionsService.Tests.Integration.Postgres
+namespace TransactionsService.Tests.Integration
 {
     public class WebAppFactory : WebApplicationFactory<Program>
     {

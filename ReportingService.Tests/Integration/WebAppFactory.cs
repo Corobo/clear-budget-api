@@ -1,13 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using ReportingService.Clients.Impl;
 using ReportingService.Clients;
-using ReportingService.Tests.Fakes;
+using ReportingService.Clients.Impl;
 using ReportingService.Tests;
+using ReportingService.Tests.Fakes;
 
 namespace TransactionsService.Tests.Integration.Postgres
 {
