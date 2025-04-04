@@ -1,34 +1,36 @@
 ﻿using CategoriesService.Models.DTO;
-using CategoriesService.Tests.Integration.Postgres;
-using CategoriesService.Tests.Integration.RabbitMQ;
+using CategoriesService.Tests.Integration.Factories;
 using FluentAssertions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using Serilog;
+using Shared.Testing.Containers;
+using Shared.Testing.Settings;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text;
+using TransactionsService.Tests.Integration.Fixtures;
 using Xunit;
 
 namespace CategoriesService.Tests.Integration
 {
-    public class IntegrationTests : IClassFixture<PostgreSqlContainerFixture>, IClassFixture<RabbitMqContainerFixture>
+    public class IntegrationTests : IClassFixture<CategoriesDbFixture>, IClassFixture<RabbitMqContainerFixture>
     {
 
         protected readonly HttpClient _client;
         private readonly RabbitMqContainerFixture _rabbitFixture;
 
 
-        public IntegrationTests(PostgreSqlContainerFixture fixture, RabbitMqContainerFixture rabbitFixture)
+        public IntegrationTests(CategoriesDbFixture fixture, RabbitMqContainerFixture rabbitFixture)
         {
             _client = CreateAuthenticatedClient(fixture);
             _rabbitFixture = rabbitFixture;
         }
 
-        private static HttpClient CreateAuthenticatedClient(PostgreSqlContainerFixture fixture)
+        private static HttpClient CreateAuthenticatedClient(CategoriesDbFixture fixture)
         {
-            var factory = new WebAppFactory(fixture.ConnectionString);
+            var factory = new CategoriesWebAppFactory(fixture.ConnectionString);
 
 
             return factory.WithWebHostBuilder(builder =>
@@ -85,24 +87,7 @@ namespace CategoriesService.Tests.Integration
         public async Task CreateUserCategory_Should_Publish_CategoryCreated_Event()
         {
             // Arrange
-            var factory = new WebAppFactory("")
-                .WithWebHostBuilder(builder =>
-                {
-                    builder.UseSetting("RabbitMQ:Host", _rabbitFixture.Hostname);
-                    builder.UseSetting("RabbitMQ:Port", _rabbitFixture.Port.ToString());
-                    builder.UseSetting("RabbitMQ:User", _rabbitFixture.Username);
-                    builder.UseSetting("RabbitMQ:Password", _rabbitFixture.Password);
-
-                    builder.ConfigureServices(services =>
-                    {
-                        services.PostConfigureAll<AuthenticationOptions>(opts =>
-                        {
-                            opts.DefaultAuthenticateScheme = "Test";
-                            opts.DefaultChallengeScheme = "Test";
-                        });
-
-                    });
-                });
+            var factory = new CategoriesWebAppFactory("", RabbitTestSettings.UseRabbitSettings(_rabbitFixture));
 
             var client = factory.CreateClient();
 
@@ -113,12 +98,9 @@ namespace CategoriesService.Tests.Integration
                 Color = "#009900"
             };
 
-
-
             // Act
             var response = await client.PostAsJsonAsync("/api/categories/user", request);
             response.EnsureSuccessStatusCode();
-
 
             // Assert
             using var channel = await _rabbitFixture.GetChannelAsync().ConfigureAwait(false);

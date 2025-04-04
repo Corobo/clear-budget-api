@@ -4,8 +4,10 @@ using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 
-namespace CategoriesService.Tests
+
+namespace Shared.Testing.Utils
 {
+
     public class TestingAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
         public TestingAuthHandler(
@@ -20,7 +22,8 @@ namespace CategoriesService.Tests
             {
             new Claim(ClaimTypes.NameIdentifier, "00000000-0000-0000-0000-000000000001"),
             new Claim(ClaimTypes.Role, "clear-budget"),
-            new Claim(ClaimTypes.Role, "clear-budget-admin")
+            new Claim(ClaimTypes.Role, "clear-budget-admin"),
+            new Claim("sub", "00000000-0000-0000-0000-000000000001")
         };
 
             var identity = new ClaimsIdentity(claims, "Test");

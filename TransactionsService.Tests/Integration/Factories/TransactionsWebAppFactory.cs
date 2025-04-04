@@ -1,33 +1,26 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Shared.Testing.Factories;
+using Shared.Testing.Utils;
 using TransactionsService.Repositories.Data;
 
-namespace TransactionsService.Tests.Integration
+namespace TransactionsService.Tests.Integration.Factories
 {
-    public class WebAppFactory : WebApplicationFactory<Program>
+    public class TransactionsWebAppFactory : CustomWebApplicationFactory<Program>
     {
-        private readonly string _connectionString;
-
-        public WebAppFactory(string connectionString)
-        {
-            _connectionString = connectionString;
-        }
-
-        protected override void ConfigureWebHost(IWebHostBuilder builder)
-        {
-            builder.UseEnvironment("Testing");
-            builder.ConfigureServices(services =>
+        public TransactionsWebAppFactory(string connectionString)
+            : base(services =>
             {
                 var descriptor = services.SingleOrDefault(
                     d => d.ServiceType == typeof(DbContextOptions<TransactionsDbContext>));
-                if (descriptor != null) services.Remove(descriptor);
+
+                if (descriptor != null)
+                    services.Remove(descriptor);
 
                 services.AddDbContext<TransactionsDbContext>(options =>
-                    options.UseNpgsql(_connectionString));
+                    options.UseNpgsql(connectionString));
 
                 services.AddAuthentication("Test")
                     .AddScheme<AuthenticationSchemeOptions, TestingAuthHandler>("Test", _ => { });
@@ -36,10 +29,8 @@ namespace TransactionsService.Tests.Integration
                 {
                     options.RoleClaimType = "roles";
                 });
-
-            });
+            })
+        {
         }
-
-
     }
 }

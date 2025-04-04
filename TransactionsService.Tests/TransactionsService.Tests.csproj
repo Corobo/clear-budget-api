@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Shared.Testing\Shared.Testing.csproj" />
     <ProjectReference Include="..\TransactionsService\TransactionsService.csproj" />
   </ItemGroup>
 

@@ -4,7 +4,7 @@ using System.Text.Json;
 using Testcontainers.RabbitMq;
 using Xunit;
 
-namespace CategoriesService.Tests.Integration.RabbitMQ
+namespace Shared.Testing.Containers
 {
     public class RabbitMqContainerFixture : IAsyncLifetime
     {
@@ -36,7 +36,6 @@ namespace CategoriesService.Tests.Integration.RabbitMQ
         public async Task DisposeAsync()
         {
             await Container.StopAsync();
-
             await Task.Delay(TimeSpan.FromSeconds(15));
         }
 
@@ -76,7 +75,7 @@ namespace CategoriesService.Tests.Integration.RabbitMQ
             return await connection.CreateChannelAsync();
         }
 
-        private async Task InitializeCategory()
+        public async Task InitializeCategory()
         {
             using var channel = await GetChannelAsync();
 

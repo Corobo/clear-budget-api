@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
 using ReportingService.Models.DTO;
+using ReportingService.Tests.Integration.Factorie;
 using System.Net;
 using System.Net.Http.Json;
-using TransactionsService.Tests.Integration.Postgres;
 
 namespace ReportingService.Tests.Integration
 {
@@ -17,7 +17,7 @@ namespace ReportingService.Tests.Integration
 
         private static HttpClient CreateAuthenticatedClient()
         {
-            var factory = new WebAppFactory();
+            var factory = new ReportingWebAppFactory();
             return factory.CreateClient();
 
         }
