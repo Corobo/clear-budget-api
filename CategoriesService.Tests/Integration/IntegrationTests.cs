@@ -10,7 +10,7 @@ using Shared.Testing.Settings;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text;
-using TransactionsService.Tests.Integration.Fixtures;
+using CategoriesService.Tests.Integration.Fixtures;
 using Xunit;
 
 namespace CategoriesService.Tests.Integration

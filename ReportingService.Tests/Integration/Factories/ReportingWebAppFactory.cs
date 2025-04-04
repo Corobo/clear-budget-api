@@ -6,7 +6,7 @@ using ReportingService.Tests.Fakes;
 using Shared.Testing.Factories;
 using Shared.Testing.Utils;
 
-namespace ReportingService.Tests.Integration.Factorie
+namespace ReportingService.Tests.Integration.Factories
 {
     public class ReportingWebAppFactory : CustomWebApplicationFactory<Program>
     {

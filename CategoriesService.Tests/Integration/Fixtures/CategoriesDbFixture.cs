@@ -2,7 +2,7 @@
 using CategoriesService.Data;
 using CategoriesService.Repositories.Data;
 
-namespace TransactionsService.Tests.Integration.Fixtures
+namespace CategoriesService.Tests.Integration.Fixtures
 {
     public class CategoriesDbFixture : PostgreSqlContainerFixture<CategoriesDbContext>
     {

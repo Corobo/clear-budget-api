@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using ReportingService.Models.DTO;
-using ReportingService.Tests.Integration.Factorie;
+using ReportingService.Tests.Integration.Factories;
 using System.Net;
 using System.Net.Http.Json;
 
