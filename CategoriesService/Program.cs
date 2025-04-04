@@ -18,7 +18,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
 using Serilog;
-using System.Security.Claims;
+using Shared.Auth.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,45 +59,9 @@ builder.Services.AddControllers()
         options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
     });
 
-// === JWT Authentication ===
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = jwtConfig["Authority"];
-        options.Audience = jwtConfig["Audience"];
-        options.RequireHttpsMetadata = false;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateAudience = true,
-            ValidateIssuer = true
-        };
-        options.Events = new JwtBearerEvents
-        {
-            OnTokenValidated = context =>
-            {
-                if (context.Principal?.Identity is ClaimsIdentity identity)
-                {
-                    var resourceAccess = context.Principal.FindFirst("resource_access")?.Value;
-                    if (resourceAccess != null)
-                    {
-                        var parsed = JObject.Parse(resourceAccess);
-                        var appRoles = parsed["clear-budget"]?["roles"];
-
-                        if (appRoles is JArray roles)
-                        {
-                            foreach (var role in roles)
-                            {
-                                identity.AddClaim(new Claim(ClaimTypes.Role, role!.ToString()));
-                            }
-                        }
-                    }
-                }
-                return Task.CompletedTask;
-            }
-        };
-    });
-
-builder.Services.AddAuthorization(); // No custom policies, use [Authorize(Roles = "...")]
+// === JWT Authentication / Authorization ===
+builder.Services.AddStandardJwtAuthentication(builder.Configuration);
+builder.Services.AddAuthorization();
 
 // === CORS ===
 builder.Services.AddCors(options =>

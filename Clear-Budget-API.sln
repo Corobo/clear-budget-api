@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Messaging", "Shared.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Messaging.Tests", "Shared.Messaging.Tests\Shared.Messaging.Tests.csproj", "{B5275D30-4E81-7F29-8F68-F56024959BE5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Auth", "Shared.Auth\Shared.Auth.csproj", "{8B24555A-053E-4D97-9CB4-DADFC67D75F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{B5275D30-4E81-7F29-8F68-F56024959BE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5275D30-4E81-7F29-8F68-F56024959BE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5275D30-4E81-7F29-8F68-F56024959BE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B24555A-053E-4D97-9CB4-DADFC67D75F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B24555A-053E-4D97-9CB4-DADFC67D75F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B24555A-053E-4D97-9CB4-DADFC67D75F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B24555A-053E-4D97-9CB4-DADFC67D75F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
