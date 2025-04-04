@@ -19,6 +19,8 @@ using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
 using Serilog;
 using Shared.Auth.Extensions;
+using Microsoft.AspNetCore.Hosting;
+using Shared.Logging.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,7 +51,10 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddSingleton<IEventBusProducer<CategoryEvent>, EventBusProducer<CategoryEvent>>();
-builder.Services.AddSingleton<Serilog.ILogger>(new LoggerConfiguration().CreateLogger());
+
+// === Logging ===
+builder.Host.UseSharedSerilog("CategoriesService");
+
 
 
 // === Controllers ===

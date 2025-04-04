@@ -23,6 +23,7 @@ using TransactionsService.Repositories.Impl;
 using TransactionsService.Services;
 using TransactionsService.Services.Impl;
 using Shared.Auth.Extensions;
+using Shared.Logging.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,8 +55,10 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddSingleton<ICategoryCache, CategoryCache>();
 builder.Services.AddSingleton<IEventBusConsumer<CategoryEvent>, CategoryEventConsumer>();
 builder.Services.AddHostedService<CategorySubscriptionService>();
-builder.Services.AddSingleton<Serilog.ILogger>(new LoggerConfiguration().CreateLogger());
 builder.Services.AddTransient<ServiceAuthHandler>();
+
+// === Logging ===
+builder.Host.UseSharedSerilog("TransactionsService");
 
 
 // === Controllers ===

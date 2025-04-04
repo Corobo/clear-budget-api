@@ -7,6 +7,7 @@ using ReportingService.Clients.Impl;
 using ReportingService.Services;
 using System.Security.Claims;
 using Shared.Auth.Extensions;
+using Shared.Logging.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,9 @@ var corsOrigins = config.GetSection("Cors:AllowedOrigins").Get<string[]>();
 
 // === Services ===
 builder.Services.AddScoped<IReportingService, ReportingService.Services.Impl.ReportingService>();
+
+// === Logging ===
+builder.Host.UseSharedSerilog("ReportingService");
 
 // === Controllers ===
 builder.Services.AddControllers()
