@@ -21,6 +21,7 @@ using Serilog;
 using Shared.Auth.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Shared.Logging.Extensions;
+using Shared.Middleware.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -150,6 +151,7 @@ if (!app.Environment.IsDevelopment())
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseSharedMiddlewares();
 app.MapControllers();
 
 app.Run();

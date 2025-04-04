@@ -32,6 +32,7 @@
     <ProjectReference Include="..\Shared.Auth\Shared.Auth.csproj" />
     <ProjectReference Include="..\Shared.Logging\Shared.Logging.csproj" />
     <ProjectReference Include="..\Shared.Messaging\Shared.Messaging.csproj" />
+    <ProjectReference Include="..\Shared.Middleware\Shared.Middleware.csproj" />
   </ItemGroup>
 
 </Project>
