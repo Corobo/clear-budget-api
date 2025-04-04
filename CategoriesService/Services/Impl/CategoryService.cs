@@ -2,9 +2,9 @@
 using global::CategoriesService.Models.DB;
 using global::CategoriesService.Models.DTO;
 using global::CategoriesService.Repositories;
-using Messaging.Configuration;
-using Messaging.EventBus;
-using Messaging.Events;
+using Shared.Messaging.Configuration;
+using Shared.Messaging.EventBus;
+using Shared.Messaging.Events;
 using Microsoft.Extensions.Options;
 
 namespace CategoriesService.Services.Impl

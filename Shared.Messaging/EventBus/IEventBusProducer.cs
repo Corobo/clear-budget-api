@@ -1,4 +1,4 @@
-﻿namespace Messaging.EventBus
+﻿namespace Shared.Messaging.EventBus
 {
     public interface IEventBusProducer<T>
     {

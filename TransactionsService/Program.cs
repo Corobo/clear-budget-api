@@ -1,8 +1,8 @@
-using Messaging.Configuration;
-using Messaging.Connection;
-using Messaging.EventBus;
-using Messaging.Events;
-using Messaging.Factories;
+using Shared.Messaging.Configuration;
+using Shared.Messaging.Connection;
+using Shared.Messaging.EventBus;
+using Shared.Messaging.Events;
+using Shared.Messaging.Factories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;

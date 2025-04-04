@@ -1,8 +1,8 @@
-﻿using Messaging.Factories;
+﻿using Shared.Messaging.Factories;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 
-namespace Messaging.Connection
+namespace Shared.Messaging.Connection
 {
     public class RabbitMqConnectionAccessor
     {

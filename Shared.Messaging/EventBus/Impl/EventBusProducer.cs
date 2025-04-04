@@ -1,9 +1,9 @@
 ﻿using RabbitMQ.Client;
 using System.Text;
 using System.Text.Json;
-using Messaging.Connection;
+using Shared.Messaging.Connection;
 
-namespace Messaging.EventBus.Impl
+namespace Shared.Messaging.EventBus.Impl
 {
     public class EventBusProducer<T> : IEventBusProducer<T>
     {

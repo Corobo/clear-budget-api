@@ -1,6 +1,6 @@
 ﻿using RabbitMQ.Client.Events;
 
-namespace Messaging.EventBus
+namespace Shared.Messaging.EventBus
 {
     public interface IEventBusConsumer<T>
     {

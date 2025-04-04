@@ -1,5 +1,5 @@
 ﻿
-namespace Messaging.Events
+namespace Shared.Messaging.Events
 {
     public class CategoryEvent
     {

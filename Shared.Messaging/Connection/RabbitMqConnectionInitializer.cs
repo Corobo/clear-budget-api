@@ -1,5 +1,5 @@
-﻿using Messaging.Configuration;
-using Messaging.Factories;
+﻿using Shared.Messaging.Configuration;
+using Shared.Messaging.Factories;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Messaging.Connection
+namespace Shared.Messaging.Connection
 {
     public class RabbitMqConnectionInitializer : BackgroundService
     {

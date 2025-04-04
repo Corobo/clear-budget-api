@@ -1,7 +1,7 @@
-﻿using Messaging.Configuration;
-using Messaging.Connection;
-using Messaging.EventBus;
-using Messaging.Factories;
+﻿using Shared.Messaging.Configuration;
+using Shared.Messaging.Connection;
+using Shared.Messaging.EventBus;
+using Shared.Messaging.Factories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -13,7 +13,7 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
-namespace Messaging.Background
+namespace Shared.Messaging.Background
 {
     public abstract class SubscriptionService<T> : BackgroundService where T : class
     {

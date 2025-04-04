@@ -1,4 +1,4 @@
-﻿using Messaging.Configuration;
+﻿using Shared.Messaging.Configuration;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using Serilog;
@@ -10,7 +10,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Messaging.Factories
+namespace Shared.Messaging.Factories
 {
     public class RabbitMqConnectionFactory
     {

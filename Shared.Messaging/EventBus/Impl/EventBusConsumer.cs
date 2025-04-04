@@ -1,7 +1,7 @@
 ﻿using RabbitMQ.Client.Events;
 using Serilog;
 
-namespace Messaging.EventBus.Impl
+namespace Shared.Messaging.EventBus.Impl
 {
     public abstract class EventBusConsumer<T> : IEventBusConsumer<T>
     {

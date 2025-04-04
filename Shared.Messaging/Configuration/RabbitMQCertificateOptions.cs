@@ -1,4 +1,4 @@
-﻿namespace Messaging.Configuration
+﻿namespace Shared.Messaging.Configuration
 {
     public class RabbitMQCertificateOptions
     {

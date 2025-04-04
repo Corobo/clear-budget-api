@@ -1,7 +1,7 @@
-﻿using Messaging.Background;
-using Messaging.Configuration;
-using Messaging.Events;
-using Messaging.Factories;
+﻿using Shared.Messaging.Background;
+using Shared.Messaging.Configuration;
+using Shared.Messaging.Events;
+using Shared.Messaging.Factories;
 using Microsoft.Extensions.Options;
 using ILogger = Serilog.ILogger;
 

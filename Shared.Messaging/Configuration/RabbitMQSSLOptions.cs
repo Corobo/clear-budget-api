@@ -1,6 +1,6 @@
 ﻿using System.Security.Authentication;
 
-namespace Messaging.Configuration
+namespace Shared.Messaging.Configuration
 {
     public class RabbitMQSSLOptions
     {

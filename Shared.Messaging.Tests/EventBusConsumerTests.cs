@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Messaging.EventBus.Impl;
+using Shared.Messaging.EventBus.Impl;
 using Moq;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
