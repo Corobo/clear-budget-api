@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ReportingService\ReportingService.csproj" />
+    <ProjectReference Include="..\Shared.Testing\Shared.Testing.csproj" />
   </ItemGroup>
 
   <ItemGroup>

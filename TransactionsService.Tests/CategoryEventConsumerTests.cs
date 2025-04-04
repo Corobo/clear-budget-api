@@ -1,4 +1,4 @@
-﻿using Messaging.Events;
+﻿using Shared.Messaging.Events;
 using Moq;
 using RabbitMQ.Client.Events;
 using Serilog;

@@ -4,12 +4,12 @@ using CategoriesService.Repositories.Data;
 using CategoriesService.Repositories.Impl;
 using CategoriesService.Services;
 using CategoriesService.Services.Impl;
-using Messaging.Configuration;
-using Messaging.Connection;
-using Messaging.EventBus;
-using Messaging.EventBus.Impl;
-using Messaging.Events;
-using Messaging.Factories;
+using Shared.Messaging.Configuration;
+using Shared.Messaging.Connection;
+using Shared.Messaging.EventBus;
+using Shared.Messaging.EventBus.Impl;
+using Shared.Messaging.Events;
+using Shared.Messaging.Factories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -18,7 +18,10 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
 using Serilog;
-using System.Security.Claims;
+using Shared.Auth.Extensions;
+using Microsoft.AspNetCore.Hosting;
+using Shared.Logging.Extensions;
+using Shared.Middleware.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,7 +52,10 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddSingleton<IEventBusProducer<CategoryEvent>, EventBusProducer<CategoryEvent>>();
-builder.Services.AddSingleton<Serilog.ILogger>(new LoggerConfiguration().CreateLogger());
+
+// === Logging ===
+builder.Host.UseSharedSerilog("CategoriesService");
+
 
 
 // === Controllers ===
@@ -59,45 +65,9 @@ builder.Services.AddControllers()
         options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
     });
 
-// === JWT Authentication ===
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = jwtConfig["Authority"];
-        options.Audience = jwtConfig["Audience"];
-        options.RequireHttpsMetadata = false;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateAudience = true,
-            ValidateIssuer = true
-        };
-        options.Events = new JwtBearerEvents
-        {
-            OnTokenValidated = context =>
-            {
-                if (context.Principal?.Identity is ClaimsIdentity identity)
-                {
-                    var resourceAccess = context.Principal.FindFirst("resource_access")?.Value;
-                    if (resourceAccess != null)
-                    {
-                        var parsed = JObject.Parse(resourceAccess);
-                        var appRoles = parsed["clear-budget"]?["roles"];
-
-                        if (appRoles is JArray roles)
-                        {
-                            foreach (var role in roles)
-                            {
-                                identity.AddClaim(new Claim(ClaimTypes.Role, role!.ToString()));
-                            }
-                        }
-                    }
-                }
-                return Task.CompletedTask;
-            }
-        };
-    });
-
-builder.Services.AddAuthorization(); // No custom policies, use [Authorize(Roles = "...")]
+// === JWT Authentication / Authorization ===
+builder.Services.AddStandardJwtAuthentication(builder.Configuration);
+builder.Services.AddAuthorization();
 
 // === CORS ===
 builder.Services.AddCors(options =>
@@ -181,6 +151,7 @@ if (!app.Environment.IsDevelopment())
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseSharedMiddlewares();
 app.MapControllers();
 
 app.Run();

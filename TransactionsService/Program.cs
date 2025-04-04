@@ -1,8 +1,8 @@
-using Messaging.Configuration;
-using Messaging.Connection;
-using Messaging.EventBus;
-using Messaging.Events;
-using Messaging.Factories;
+using Shared.Messaging.Configuration;
+using Shared.Messaging.Connection;
+using Shared.Messaging.EventBus;
+using Shared.Messaging.Events;
+using Shared.Messaging.Factories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -22,6 +22,9 @@ using TransactionsService.Repositories.Data;
 using TransactionsService.Repositories.Impl;
 using TransactionsService.Services;
 using TransactionsService.Services.Impl;
+using Shared.Auth.Extensions;
+using Shared.Logging.Extensions;
+using Shared.Middleware.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,8 +56,10 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddSingleton<ICategoryCache, CategoryCache>();
 builder.Services.AddSingleton<IEventBusConsumer<CategoryEvent>, CategoryEventConsumer>();
 builder.Services.AddHostedService<CategorySubscriptionService>();
-builder.Services.AddSingleton<Serilog.ILogger>(new LoggerConfiguration().CreateLogger());
 builder.Services.AddTransient<ServiceAuthHandler>();
+
+// === Logging ===
+builder.Host.UseSharedSerilog("TransactionsService");
 
 
 // === Controllers ===
@@ -64,45 +69,9 @@ builder.Services.AddControllers()
         options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
     });
 
-// === JWT Authentication ===
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = jwtConfig["Authority"];
-        options.Audience = jwtConfig["Audience"];
-        options.RequireHttpsMetadata = false;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateAudience = true,
-            ValidateIssuer = true
-        };
-        options.Events = new JwtBearerEvents
-        {
-            OnTokenValidated = context =>
-            {
-                if (context.Principal?.Identity is ClaimsIdentity identity)
-                {
-                    var resourceAccess = context.Principal.FindFirst("resource_access")?.Value;
-                    if (resourceAccess != null)
-                    {
-                        var parsed = JObject.Parse(resourceAccess);
-                        var appRoles = parsed["clear-budget"]?["roles"];
-
-                        if (appRoles is JArray roles)
-                        {
-                            foreach (var role in roles)
-                            {
-                                identity.AddClaim(new Claim(ClaimTypes.Role, role!.ToString()));
-                            }
-                        }
-                    }
-                }
-                return Task.CompletedTask;
-            }
-        };
-    });
-
-builder.Services.AddAuthorization(); // No custom policies, use [Authorize(Roles = "...")]
+// === JWT Authentication / Authorization ===
+builder.Services.AddStandardJwtAuthentication(builder.Configuration);
+builder.Services.AddAuthorization();
 
 // === CORS ===
 builder.Services.AddCors(options =>
@@ -196,6 +165,7 @@ if (!app.Environment.IsDevelopment())
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseSharedMiddlewares();
 app.MapControllers();
 
 app.Run();

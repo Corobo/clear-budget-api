@@ -1,5 +1,5 @@
-﻿using Messaging.EventBus.Impl;
-using Messaging.Events;
+﻿using Shared.Messaging.EventBus.Impl;
+using Shared.Messaging.Events;
 using TransactionsService.Services;
 using ILogger = Serilog.ILogger;
 

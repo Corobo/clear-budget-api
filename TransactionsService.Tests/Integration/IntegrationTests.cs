@@ -2,31 +2,33 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Shared.Testing.Containers;
 using System.Net;
 using System.Net.Http.Json;
 using TransactionsService.Models.DTO;
-using TransactionsService.Tests.Integration.Postgres;
-using TransactionsService.Tests.Integration.RabbitMQ;
+using TransactionsService.Tests.Integration.Fixtures;
+using TransactionsService.Tests.Integration;
+using TransactionsService.Tests.Integration.Factories;
 
 namespace TransactionsService.Tests.Integration
 {
-    public class IntegrationTests : IClassFixture<PostgreSqlContainerFixture>, IClassFixture<RabbitMqContainerFixture>
+    public class IntegrationTests : IClassFixture<TransactionsDbFixture>, IClassFixture<RabbitMqContainerFixture>
     {
 
         private readonly HttpClient _client;
         private readonly RabbitMqContainerFixture _rabbitFixture;
-        private readonly PostgreSqlContainerFixture _postgresFixture;
+        private readonly TransactionsDbFixture _postgresFixture;
 
-        public IntegrationTests(PostgreSqlContainerFixture fixture, RabbitMqContainerFixture rabbitMqContainerFixture)
+        public IntegrationTests(TransactionsDbFixture fixture, RabbitMqContainerFixture rabbitMqContainerFixture)
         {
             _client = CreateAuthenticatedClient(fixture, rabbitMqContainerFixture);
             _rabbitFixture = rabbitMqContainerFixture;
             _postgresFixture = fixture;
         }
 
-        private static HttpClient CreateAuthenticatedClient(PostgreSqlContainerFixture fixture, RabbitMqContainerFixture rabbitMqContainerFixture)
+        private static HttpClient CreateAuthenticatedClient(TransactionsDbFixture fixture, RabbitMqContainerFixture rabbitMqContainerFixture)
         {
-            var factory = new WebAppFactory(fixture.ConnectionString);
+            var factory = new TransactionsWebAppFactory(fixture.ConnectionString);
 
             return factory.WithWebHostBuilder(builder =>
             {

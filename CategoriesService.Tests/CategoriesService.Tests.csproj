@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CategoriesService\CategoriesService.csproj" />
+    <ProjectReference Include="..\Shared.Testing\Shared.Testing.csproj" />
   </ItemGroup>
 
 </Project>
