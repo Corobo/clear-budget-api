@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +11,8 @@ namespace TransactionsService.Tests.Integration.Factories
 {
     public class TransactionsWebAppFactory : CustomWebApplicationFactory<Program>
     {
-        public TransactionsWebAppFactory(string connectionString)
+        public TransactionsWebAppFactory(string connectionString, 
+            Action<IWebHostBuilder>? customWebHostBuilder = null)
             : base(services =>
             {
                 var descriptor = services.SingleOrDefault(
@@ -29,7 +31,8 @@ namespace TransactionsService.Tests.Integration.Factories
                 {
                     options.RoleClaimType = "roles";
                 });
-            })
+            },
+            customWebHostBuilder: customWebHostBuilder)
         {
         }
     }

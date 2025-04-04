@@ -16,6 +16,7 @@ namespace Shared.Testing.Factories
         {
             _overrideServices = overrideServices;
             _customWebHostBuilder = customWebHostBuilder;
+            Console.WriteLine(typeof(TEntryPoint).Assembly.Location);
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)

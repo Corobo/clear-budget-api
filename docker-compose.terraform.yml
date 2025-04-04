@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  terraform:
+    build:
+      context: ./infra/docker/terraform-runner
+    volumes:
+      - ./infra:/infra
+    env_file:
+      - .env.terraform
+    environment:
+      - TARGET_DIR=${TARGET_DIR}

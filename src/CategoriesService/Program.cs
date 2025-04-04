@@ -1,6 +1,13 @@
+using CategoriesService.Data;
+using CategoriesService.Repositories;
+using CategoriesService.Repositories.Data;
+using CategoriesService.Repositories.Impl;
+using CategoriesService.Services;
+using CategoriesService.Services.Impl;
 using Shared.Messaging.Configuration;
 using Shared.Messaging.Connection;
 using Shared.Messaging.EventBus;
+using Shared.Messaging.EventBus.Impl;
 using Shared.Messaging.Events;
 using Shared.Messaging.Factories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -11,25 +18,17 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
 using Serilog;
-using System.Security.Claims;
-using TransactionsService.Clients;
-using TransactionsService.Clients.Impl;
-using TransactionsService.Data;
-using TransactionsService.Messaging.Consumers;
-using TransactionsService.Messaging.Subscriptions;
-using TransactionsService.Repositories;
-using TransactionsService.Repositories.Data;
-using TransactionsService.Repositories.Impl;
-using TransactionsService.Services;
-using TransactionsService.Services.Impl;
 using Shared.Auth.Extensions;
+using Microsoft.AspNetCore.Hosting;
 using Shared.Logging.Extensions;
 using Shared.Middleware.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // === Get configuration from appsettings.json ===
-var config = builder.Configuration;
+var config = builder.Configuration.
+    AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    .Build();
 var jwtConfig = config.GetSection("Jwt");
 var corsOrigins = config.GetSection("Cors:AllowedOrigins").Get<string[]>();
 
@@ -41,25 +40,24 @@ builder.Services.AddSingleton<RabbitMqConnectionFactory>();
 builder.Services.AddHostedService<RabbitMqConnectionInitializer>();
 
 
+
 // === EF Core ===
 if (!builder.Environment.IsEnvironment("Testing"))
 {
-    builder.Services.AddDbContext<TransactionsDbContext>(options =>
+    builder.Services.AddDbContext<CategoriesDbContext>(options =>
         options.UseNpgsql(config.GetConnectionString("DefaultConnection")));
 }
 
 
 // === Services ===
-builder.Services.AddScoped<ITransactionService, TransactionService>();
-builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddSingleton<ICategoryCache, CategoryCache>();
-builder.Services.AddSingleton<IEventBusConsumer<CategoryEvent>, CategoryEventConsumer>();
-builder.Services.AddHostedService<CategorySubscriptionService>();
-builder.Services.AddTransient<ServiceAuthHandler>();
+builder.Services.AddSingleton<IEventBusProducer<CategoryEvent>, EventBusProducer<CategoryEvent>>();
 
 // === Logging ===
-builder.Host.UseSharedSerilog("TransactionsService");
+builder.Host.UseSharedSerilog("CategoriesService");
+
 
 
 // === Controllers ===
@@ -86,7 +84,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Transactions API", Version = "v1" });
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Categories API", Version = "v1" });
 
     // Optional: Add support for JWT in Swagger
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -111,31 +109,21 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// === Clients ===
-builder.Services.AddHttpClient<ICategoriesClient, CategoriesClient>(client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["Services:Categories"]);
-}).AddHttpMessageHandler<ServiceAuthHandler>();
-builder.Services.AddHttpClient<IAuthTokenClient, AuthTokenClient>();
-
-
-
-
 
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    var db = services.GetRequiredService<TransactionsDbContext>();
+    var db = services.GetRequiredService<CategoriesDbContext>();
 
     var restart = config.GetValue<bool>("RestartSchema");
 
     if (app.Environment.IsDevelopment() && restart)
     {
         // Drop and recreate schema
-        db.Database.ExecuteSqlRaw("DROP SCHEMA IF EXISTS transactions CASCADE;");
-        db.Database.ExecuteSqlRaw("CREATE SCHEMA transactions;");
+        db.Database.ExecuteSqlRaw("DROP SCHEMA IF EXISTS categories CASCADE;");
+        db.Database.ExecuteSqlRaw("CREATE SCHEMA categories;");
         db.Database.Migrate();       // Recreate schema
         SeedData.Initialize(db);
     }

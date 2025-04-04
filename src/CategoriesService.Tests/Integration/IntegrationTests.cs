@@ -24,13 +24,13 @@ namespace CategoriesService.Tests.Integration
 
         public IntegrationTests(CategoriesDbFixture fixture, RabbitMqContainerFixture rabbitFixture)
         {
-            _client = CreateAuthenticatedClient(fixture);
+            _client = CreateAuthenticatedClient(fixture, rabbitFixture);
             _rabbitFixture = rabbitFixture;
         }
 
-        private static HttpClient CreateAuthenticatedClient(CategoriesDbFixture fixture)
+        private static HttpClient CreateAuthenticatedClient(CategoriesDbFixture fixture, RabbitMqContainerFixture rabbitMqContainerFixture)
         {
-            var factory = new CategoriesWebAppFactory(fixture.ConnectionString);
+            var factory = new CategoriesWebAppFactory(fixture.ConnectionString,RabbitTestSettings.UseRabbitSettings(rabbitMqContainerFixture));
 
 
             return factory.WithWebHostBuilder(builder =>

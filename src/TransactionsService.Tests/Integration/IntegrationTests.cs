@@ -7,8 +7,8 @@ using System.Net;
 using System.Net.Http.Json;
 using TransactionsService.Models.DTO;
 using TransactionsService.Tests.Integration.Fixtures;
-using TransactionsService.Tests.Integration;
 using TransactionsService.Tests.Integration.Factories;
+using Shared.Testing.Settings;
 
 namespace TransactionsService.Tests.Integration
 {
@@ -28,25 +28,8 @@ namespace TransactionsService.Tests.Integration
 
         private static HttpClient CreateAuthenticatedClient(TransactionsDbFixture fixture, RabbitMqContainerFixture rabbitMqContainerFixture)
         {
-            var factory = new TransactionsWebAppFactory(fixture.ConnectionString);
-
-            return factory.WithWebHostBuilder(builder =>
-            {
-                builder.UseSetting("ConnectionStrings:DefaultConnection", fixture.ConnectionString);
-                builder.UseSetting("RabbitMQ:Host", rabbitMqContainerFixture.Hostname);
-                builder.UseSetting("RabbitMQ:Port", rabbitMqContainerFixture.Port.ToString());
-                builder.UseSetting("RabbitMQ:User", rabbitMqContainerFixture.Username);
-                builder.UseSetting("RabbitMQ:Password", rabbitMqContainerFixture.Password);
-                builder.ConfigureServices(services =>
-                {
-                    services.PostConfigureAll<AuthenticationOptions>(opts =>
-                    {
-                        opts.DefaultAuthenticateScheme = "Test";
-                        opts.DefaultChallengeScheme = "Test";
-                    });
-                    services.AddSingleton<Serilog.ILogger>(new LoggerConfiguration().CreateLogger());
-                });
-            }).CreateClient();
+            var factory = new TransactionsWebAppFactory(fixture.ConnectionString, RabbitTestSettings.UseRabbitSettings(rabbitMqContainerFixture));
+            return factory.CreateClient();
         }
 
         [Fact]

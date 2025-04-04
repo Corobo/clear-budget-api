@@ -13,7 +13,9 @@ using Shared.Middleware.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 // === Get configuration from appsettings.json ===
-var config = builder.Configuration;
+var config = builder.Configuration.
+    AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    .Build();
 var jwtConfig = config.GetSection("Jwt");
 var corsOrigins = config.GetSection("Cors:AllowedOrigins").Get<string[]>();
 
