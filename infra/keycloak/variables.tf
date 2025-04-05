@@ -16,5 +16,5 @@ variable "keycloak_admin_password" {
 variable "keycloak_realm" {
   description = "Realm where the client and roles will be created"
   type        = string
-  default     = "adji"
+  default     = "customer"
 }

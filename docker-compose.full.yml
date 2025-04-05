@@ -3,7 +3,7 @@ version: "3.9"
 services:
 
   postgres:
-    image: postgres:15
+    image: postgres:17
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -26,13 +26,13 @@ services:
     networks:
       - clearbudget-net
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:15672"]
+      test: [ "CMD", "curl", "-f", "http://localhost:15672" ]
       interval: 5s
       timeout: 10s
       retries: 10
 
   keycloak:
-    image: quay.io/keycloak/keycloak:22.0.3
+    image: quay.io/keycloak/keycloak:26.1.4
     command: start-dev
     environment:
       KEYCLOAK_ADMIN: admin
@@ -42,18 +42,41 @@ services:
     networks:
       - clearbudget-net
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
       interval: 5s
       timeout: 10s
       retries: 20
+
+  terraform:
+    build:
+      context: .
+      dockerfile: infra/docker/terraform-runner/Dockerfile
+    volumes:
+      - ./infra:/infra
+      - terraform-status:/shared
+    env_file:
+      - .env.terraform
+    networks:
+      - clearbudget-net
+    command: /entrypoint.sh
+    depends_on:
+      - keycloak
+      - rabbitmq
+    tty: true
+    stdin_open: true
 
   categories-service:
     build:
       context: .
       dockerfile: src/CategoriesService/Dockerfile
+    volumes:
+      - terraform-status:/shared
     environment:
       ASPNETCORE_ENVIRONMENT: Docker
+      ASPNETCORE_URLS: http://+:80
+      DLL_NAME: CategoriesService.dll
     depends_on:
+      - terraform
       - postgres
       - rabbitmq
     networks:
@@ -63,9 +86,14 @@ services:
     build:
       context: .
       dockerfile: src/TransactionsService/Dockerfile
+    volumes:
+      - terraform-status:/shared
     environment:
       ASPNETCORE_ENVIRONMENT: Docker
+      ASPNETCORE_URLS: http://+:80
+      DLL_NAME: TransactionsService.dll
     depends_on:
+      - terraform
       - postgres
       - rabbitmq
     networks:
@@ -75,9 +103,14 @@ services:
     build:
       context: .
       dockerfile: src/ReportingService/Dockerfile
+    volumes:
+      - terraform-status:/shared
     environment:
       ASPNETCORE_ENVIRONMENT: Docker
+      ASPNETCORE_URLS: http://+:80
+      DLL_NAME: ReportingService.dll
     depends_on:
+      - terraform
       - transactions-service
     networks:
       - clearbudget-net
@@ -85,11 +118,15 @@ services:
   gateway:
     build:
       context: .
-      dockerfile: src/Gateway/Dockerfile
+      dockerfile: src/APIGateway/Dockerfile
+    volumes:
+      - terraform-status:/shared
     ports:
       - "8081:80"
     environment:
       ASPNETCORE_ENVIRONMENT: Docker
+      ASPNETCORE_URLS: http://+:80
+      DLL_NAME: APIGateway.dll
     depends_on:
       - categories-service
       - transactions-service
@@ -97,24 +134,9 @@ services:
     networks:
       - clearbudget-net
 
-  terraform:
-    build:
-      context: ./infra/docker/terraform-runner
-    volumes:
-      - ./infra:/infra
-    env_file:
-      - .env.terraform
-    networks:
-      - clearbudget-net
-    depends_on:
-      keycloak:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    restart: "no"
-
 volumes:
   postgres-data:
+  terraform-status:
 
 networks:
   clearbudget-net:

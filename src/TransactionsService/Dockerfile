@@ -1,30 +1,45 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
+# Base image for runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
-EXPOSE 8081
 
-
-# This stage is used to build the service project
+# Build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["TransactionsService/TransactionsService.csproj", "TransactionsService/"]
-RUN dotnet restore "./TransactionsService/TransactionsService.csproj"
-COPY . .
+
+# Copy only the project files required for restore
+COPY ["src/TransactionsService/TransactionsService.csproj", "TransactionsService/"]
+COPY ["src/Shared.Auth/Shared.Auth.csproj", "Shared.Auth/"]
+COPY ["src/Shared.Logging/Shared.Logging.csproj", "Shared.Logging/"]
+COPY ["src/Shared.Messaging/Shared.Messaging.csproj", "Shared.Messaging/"]
+COPY ["src/Shared.Middleware/Shared.Middleware.csproj", "Shared.Middleware/"]
+
+# Restore dependencies
+RUN dotnet restore "TransactionsService/TransactionsService.csproj"
+
+# Copy the full source code
+COPY src/ .
+
+# Build the service
 WORKDIR "/src/TransactionsService"
-RUN dotnet build "./TransactionsService.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "TransactionsService.csproj" -c Release -o /app/build
 
-# This stage is used to publish the service project to be copied to the final stage
+# Publish the service
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./TransactionsService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "TransactionsService.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
+# Final runtime image
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "TransactionsService.dll"]
+
+# Add entrypoint and make it executable
+COPY src/CategoriesService/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Set which DLL to execute
+ENV DLL_NAME=CategoriesService.dll
+
+# Entrypoint waits for Terraform before launching
+EXPOSE 80
+ENTRYPOINT ["/entrypoint.sh"]

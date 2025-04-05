@@ -4,9 +4,7 @@ RUN apk add --no-cache bash curl git jq make
 
 WORKDIR /infra
 
-COPY entrypoint.sh /entrypoint.sh
-COPY ../../Makefile /infra/Makefile
-
+COPY infra/docker/terraform-runner/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
