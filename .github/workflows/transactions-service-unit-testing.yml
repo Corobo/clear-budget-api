@@ -24,7 +24,12 @@ jobs:
       - name: Build
         run: dotnet build ClearBudget.sln --no-restore --configuration Release
 
-      - name: Run unit tests
+      - name: Run TransactionsService.Tests
         run: dotnet test tests/TransactionsService.Tests/TransactionsService.Tests.csproj --no-build --configuration Release
+
+      - name: Run CategoryEventConsumerTest.Tests
         run: dotnet test tests/TransactionsService.Tests/CategoryEventConsumerTest.Tests.csproj --no-build --configuration Release
+
+      - name: Run CategoryCacheTests.Tests
         run: dotnet test tests/TransactionsService.Tests/CategoryCacheTests.Tests.csproj --no-build --configuration Release
+
