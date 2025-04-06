@@ -12,7 +12,7 @@ using TransactionsService.Repositories.Data;
 namespace TransactionsService.Repositories.Migrations
 {
     [DbContext(typeof(TransactionsDbContext))]
-    [Migration("20250401160307_InitialCreateTransaction")]
+    [Migration("20250406161541_InitialCreateTransaction")]
     partial class InitialCreateTransaction
     {
         /// <inheritdoc />
@@ -58,9 +58,8 @@ namespace TransactionsService.Repositories.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 

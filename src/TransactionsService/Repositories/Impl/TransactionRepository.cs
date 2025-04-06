@@ -14,7 +14,7 @@ namespace TransactionsService.Repositories.Impl
             _context = context;
         }
 
-        public async Task<IEnumerable<Transaction>> GetAllByUserIdAsync(string userId)
+        public async Task<IEnumerable<Transaction>> GetAllByUserIdAsync(Guid userId)
         {
             return await _context.Transactions
                 .Where(t => t.UserId == userId)
@@ -22,7 +22,7 @@ namespace TransactionsService.Repositories.Impl
                 .ToListAsync();
         }
 
-        public async Task<Transaction?> GetByIdAsync(Guid id, string userId)
+        public async Task<Transaction?> GetByIdAsync(Guid id, Guid userId)
         {
             return await _context.Transactions
                 .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
@@ -57,7 +57,7 @@ namespace TransactionsService.Repositories.Impl
             return true;
         }
 
-        public async Task<bool> DeleteAsync(Guid id, string userId)
+        public async Task<bool> DeleteAsync(Guid id, Guid userId)
         {
             var transaction = await _context.Transactions
                 .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);

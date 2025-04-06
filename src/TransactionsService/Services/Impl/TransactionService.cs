@@ -16,19 +16,19 @@ namespace TransactionsService.Services.Impl
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<TransactionDTO>> GetAllByUserIdAsync(string userId)
+        public async Task<IEnumerable<TransactionDTO>> GetAllByUserIdAsync(Guid userId)
         {
             var entities = await _repository.GetAllByUserIdAsync(userId);
             return _mapper.Map<IEnumerable<TransactionDTO>>(entities);
         }
 
-        public async Task<TransactionDTO?> GetByIdAsync(Guid id, string userId)
+        public async Task<TransactionDTO?> GetByIdAsync(Guid id, Guid userId)
         {
             var entity = await _repository.GetByIdAsync(id, userId);
             return entity == null ? null : _mapper.Map<TransactionDTO>(entity);
         }
 
-        public async Task<TransactionDTO> CreateAsync(CreateTransactionDTO dto, string userId)
+        public async Task<TransactionDTO> CreateAsync(CreateTransactionDTO dto, Guid userId)
         {
             var entity = _mapper.Map<Transaction>(dto);
             entity.UserId = userId;
@@ -37,7 +37,7 @@ namespace TransactionsService.Services.Impl
             return _mapper.Map<TransactionDTO>(created);
         }
 
-        public async Task<bool> UpdateAsync(Guid id, UpdateTransactionDTO dto, string userId)
+        public async Task<bool> UpdateAsync(Guid id, UpdateTransactionDTO dto, Guid userId)
         {
             var existing = await _repository.GetByIdAsync(id, userId);
             if (existing == null) return false;
@@ -49,7 +49,7 @@ namespace TransactionsService.Services.Impl
             return await _repository.UpdateAsync(existing);
         }
 
-        public Task<bool> DeleteAsync(Guid id, string userId)
+        public Task<bool> DeleteAsync(Guid id, Guid userId)
         {
             return _repository.DeleteAsync(id, userId);
         }

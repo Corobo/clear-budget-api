@@ -31,37 +31,46 @@ namespace TransactionsService.Repositories.Data
 
             modelBuilder.Entity<Transaction>(entity =>
             {
-                entity.ToTable("Transactions");
+                entity.ToTable("transactions");
 
                 entity.HasKey(t => t.Id);
 
                 entity.Property(t => t.Id)
+                    .HasColumnName("id")
                     .IsRequired();
 
                 entity.Property(t => t.UserId)
+                    .HasColumnName("user_id")
                     .IsRequired();
 
                 entity.Property(t => t.CategoryId)
+                    .HasColumnName("category_id")
                     .IsRequired();
 
                 entity.Property(t => t.Amount)
+                    .HasColumnName("amount")
                     .IsRequired()
                     .HasPrecision(18, 2);
 
                 entity.Property(t => t.Description)
+                    .HasColumnName("description")
                     .HasMaxLength(500);
 
                 entity.Property(t => t.Type)
+                    .HasColumnName("type")
                     .IsRequired();
 
                 entity.Property(t => t.Date)
+                    .HasColumnName("date")
                     .IsRequired();
 
                 entity.Property(t => t.CreatedAt)
+                    .HasColumnName("created_at")
                     .IsRequired()
                     .HasDefaultValueSql("NOW()");
 
                 entity.Property(t => t.UpdatedAt)
+                    .HasColumnName("updated_at")
                     .IsRequired(false);
             });
         }
