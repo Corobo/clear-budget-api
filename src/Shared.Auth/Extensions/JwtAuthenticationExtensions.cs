@@ -3,55 +3,77 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
+using Serilog;
 using System.Security.Claims;
 
-namespace Shared.Auth.Extensions;
-
-public static class JwtAuthenticationExtensions
+namespace Shared.Auth.Extensions
 {
-    public static IServiceCollection AddStandardJwtAuthentication(this IServiceCollection services,
-        IConfiguration configuration)
+    public static class JwtAuthenticationExtensions
     {
-        var jwtConfig = configuration.GetSection("Jwt");
-        var clientId = jwtConfig["ClientId"];
+        public static IServiceCollection AddStandardJwtAuthentication(this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            var jwtConfig = configuration.GetSection("Jwt");
 
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.Authority = jwtConfig["Authority"];
-                options.Audience = jwtConfig["Audience"];
-                options.RequireHttpsMetadata = false;
-                options.TokenValidationParameters = new TokenValidationParameters
+            var audiences = jwtConfig.GetSection("Audience").Get<string[]>();
+            var authority = jwtConfig["Authority"];
+            var issuers = jwtConfig.GetSection("Issuers").Get<string[]>();
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
                 {
-                    ValidateAudience = true,
-                    ValidateIssuer = true
-                };
-                options.Events = new JwtBearerEvents
-                {
-                    OnTokenValidated = context =>
+                    options.Authority = authority;
+                    options.RequireHttpsMetadata = false;
+
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        if (context.Principal?.Identity is ClaimsIdentity identity)
-                        {
-                            var resourceAccess = context.Principal.FindFirst("resource_access")?.Value;
-                            if (resourceAccess != null)
-                            {
-                                var parsed = JObject.Parse(resourceAccess);
-                                var appRoles = parsed[clientId]?["roles"];
+                        ValidateAudience = true,
+                        ValidAudiences = audiences,
+                        ValidateIssuer = true,
+                        ValidIssuers = issuers
+                    };
 
-                                if (appRoles is JArray roles)
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnTokenValidated = context =>
+                        {
+                            Log.Information("JWT token validated successfully.");
+
+                            if (context.Principal?.Identity is ClaimsIdentity identity)
+                            {
+                                var realmAccess = context.Principal.FindFirst("realm_access")?.Value;
+                                if (realmAccess != null)
                                 {
-                                    foreach (var role in roles)
+                                    var parsed = JObject.Parse(realmAccess);
+                                    var realmRoles = parsed["roles"] as JArray;
+
+                                    if (realmRoles != null)
                                     {
-                                        identity.AddClaim(new Claim(ClaimTypes.Role, role!.ToString()));
+                                        foreach (var role in realmRoles)
+                                        {
+                                            identity.AddClaim(new Claim(ClaimTypes.Role, role!.ToString()));
+                                        }
                                     }
                                 }
                             }
-                        }
-                        return Task.CompletedTask;
-                    }
-                };
-            });
 
-        return services;
+                            return Task.CompletedTask;
+                        },
+                        OnAuthenticationFailed = context =>
+                        {
+                            Log.Error(context.Exception, "JWT authentication failed: {Message}", context.Exception.Message);
+                            return Task.CompletedTask;
+                        },
+                        OnChallenge = context =>
+                        {
+                            Log.Warning("JWT challenge triggered. Error: {Error}, Description: {ErrorDescription}",
+                                context.Error, context.ErrorDescription);
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
+
+            return services;
+        }
     }
 }

@@ -10,6 +10,7 @@ WORKDIR /src
 # Copy only the project files required for restore
 COPY ["src/APIGateway/APIGateway.csproj", "APIGateway/"]
 COPY ["src/Shared.Auth/Shared.Auth.csproj", "Shared.Auth/"]
+COPY ["src/Shared.Logging/Shared.Logging.csproj", "Shared.Logging/"]
 
 # Restore dependencies
 RUN dotnet restore "APIGateway/APIGateway.csproj"

@@ -81,6 +81,8 @@ services:
       - rabbitmq
     networks:
       - clearbudget-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   transactions-service:
     build:
@@ -98,6 +100,8 @@ services:
       - rabbitmq
     networks:
       - clearbudget-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   reporting-service:
     build:
@@ -114,6 +118,8 @@ services:
       - transactions-service
     networks:
       - clearbudget-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   gateway:
     build:
@@ -133,6 +139,8 @@ services:
       - reporting-service
     networks:
       - clearbudget-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 volumes:
   postgres-data:

@@ -1,7 +1,7 @@
 keycloak_url            = "http://localhost:8080"
 keycloak_admin_user     = "admin"
 keycloak_admin_password = "admin"
-keycloak_realm          = "adji"
+keycloak_realm          = "customer"
 
 rabbitmq_url            = "http://localhost:15672"
 rabbitmq_user           = "user"

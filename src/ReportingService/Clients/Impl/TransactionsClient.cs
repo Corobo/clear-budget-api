@@ -14,7 +14,7 @@ namespace ReportingService.Clients.Impl
         public async Task<IEnumerable<TransactionDTO>> GetUserTransactionsAsync(string userId,
             CancellationToken cancellationToken = default)
         {
-            var requestUri = $"/api/transactions?userId={userId}"; // Incluye el userId en la URI si es necesario
+            var requestUri = $"/api/transactions?userId={userId}"; 
             var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
 
             try

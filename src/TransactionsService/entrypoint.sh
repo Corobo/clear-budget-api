@@ -7,6 +7,9 @@ while [ ! -f /shared/.terraform_done ]; do
   sleep 2
 done
 
-echo "✅ Terraform provisioning detected. Starting service..."
-exec dotnet "$DLL_NAME"
+echo "🔎 Extracting client secret from JSON..."
+CLIENT_SECRET=$(jq -r '.client_secret' /shared/client-secret.transaction.json)
+
+echo "✅ Secret exported. Starting service..."
+exec env Auth__ClientSecret="$CLIENT_SECRET" dotnet "$DLL_NAME"
 

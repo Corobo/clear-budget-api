@@ -6,7 +6,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "categories-service",
-          "Port": 8080
+          "Port": 80
         }
       ],
       "UpstreamPathTemplate": "/api/categories/{everything}",
@@ -21,7 +21,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "transactions-service",
-          "Port": 8080
+          "Port": 80
         }
       ],
       "UpstreamPathTemplate": "/api/transactions/{everything}",
@@ -36,7 +36,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "reporting-service",
-          "Port": 8080
+          "Port": 80
         }
       ],
       "UpstreamPathTemplate": "/api/reporting/{everything}",

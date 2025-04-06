@@ -5,6 +5,7 @@ using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using Shared.Auth.Extensions;
 using System.Security.Claims;
+using Shared.Logging.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,9 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader()
               .AllowAnyMethod());
 });
+
+// === Logging ===
+builder.Host.UseSharedSerilog("APIGateway");
 
 builder.Services.AddOcelot();
 

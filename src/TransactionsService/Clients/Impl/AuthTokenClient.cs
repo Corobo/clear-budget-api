@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Serilog;
 
 namespace TransactionsService.Clients.Impl
 {
@@ -18,6 +19,10 @@ namespace TransactionsService.Clients.Impl
             var clientId = _config["Auth:ClientId"];
             var clientSecret = _config["Auth:ClientSecret"];
             var tokenUrl = _config["Auth:TokenUrl"];
+
+            Log.Information("Getting access token from {TokenUrl}", tokenUrl);
+            Log.Information("ClientId: {ClientId}", clientId);
+            Log.Information("ClientSecret: {ClientSecret}", clientSecret);
 
             var body = new FormUrlEncodedContent(new[]
             {

@@ -33,11 +33,11 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 # Add entrypoint and make it executable
-COPY src/CategoriesService/entrypoint.sh /entrypoint.sh
+COPY src/ReportingService/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Set which DLL to execute
-ENV DLL_NAME=CategoriesService.dll
+ENV DLL_NAME=ReportingService.dll
 
 # Entrypoint waits for Terraform before launching
 EXPOSE 80

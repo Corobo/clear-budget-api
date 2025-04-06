@@ -8,7 +8,7 @@ namespace ReportingService.Controllers
     public abstract class AuthorizedControllerBase : ControllerBase
     {
         protected string UserId =>
-            User.FindFirst("sub")?.Value
+            User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value
             ?? throw new UnauthorizedAccessException("No user ID found in token.");
     }
 }

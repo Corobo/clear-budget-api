@@ -31,14 +31,17 @@ RUN dotnet publish "TransactionsService.csproj" -c Release -o /app/publish /p:Us
 # Final runtime image
 FROM base AS final
 WORKDIR /app
+
+RUN apt-get update && apt-get install -y jq && rm -rf /var/lib/apt/lists/*
+
 COPY --from=publish /app/publish .
 
 # Add entrypoint and make it executable
-COPY src/CategoriesService/entrypoint.sh /entrypoint.sh
+COPY src/TransactionsService/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Set which DLL to execute
-ENV DLL_NAME=CategoriesService.dll
+ENV DLL_NAME=TransactionsService.dll
 
 # Entrypoint waits for Terraform before launching
 EXPOSE 80
