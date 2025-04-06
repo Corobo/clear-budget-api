@@ -23,7 +23,7 @@ namespace CategoriesService.Repositories.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("CategoriesService.Model.DB.Category", b =>
+            modelBuilder.Entity("CategoriesService.Models.DB.Category", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()

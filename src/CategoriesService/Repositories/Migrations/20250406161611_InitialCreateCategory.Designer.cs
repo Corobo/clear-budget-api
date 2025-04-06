@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CategoriesService.Repositories.Migrations
 {
     [DbContext(typeof(CategoriesDbContext))]
-    [Migration("20250401104944_InitialCreateCategory")]
+    [Migration("20250406161611_InitialCreateCategory")]
     partial class InitialCreateCategory
     {
         /// <inheritdoc />
@@ -26,7 +26,7 @@ namespace CategoriesService.Repositories.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("CategoriesService.Model.DB.Category", b =>
+            modelBuilder.Entity("CategoriesService.Models.DB.Category", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()

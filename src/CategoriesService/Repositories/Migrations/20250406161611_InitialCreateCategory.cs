@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -14,7 +15,7 @@ namespace CategoriesService.Repositories.Migrations
                 name: "categories");
 
             migrationBuilder.CreateTable(
-                name: "Categories",
+                name: "categories",
                 schema: "categories",
                 columns: table => new
                 {
@@ -26,7 +27,7 @@ namespace CategoriesService.Repositories.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Categories", x => x.Id);
+                    table.PrimaryKey("pk_categories", x => x.Id);
                 });
         }
 
@@ -34,7 +35,7 @@ namespace CategoriesService.Repositories.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Categories",
+                name: "categories",
                 schema: "categories");
         }
     }
