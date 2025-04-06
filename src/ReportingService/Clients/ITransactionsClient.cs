@@ -4,7 +4,7 @@ namespace ReportingService.Clients
 {
     public interface ITransactionsClient
     {
-        Task<IEnumerable<TransactionDTO>> GetUserTransactionsAsync(string userId,
+        Task<IEnumerable<TransactionDTO>> GetUserTransactionsAsync(Guid userId,
             CancellationToken cancellationToken = default);
     }
 }

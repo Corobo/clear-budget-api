@@ -24,7 +24,7 @@ namespace ReportingService.Tests.Services
         public async Task GetDashboardReportAsync_ReturnsData_WhenNoCache()
         {
             // Arrange
-            var userId = "user-1";
+            var userId = Guid.Parse("00000000-0000-0000-0000-000000000001");
             var transactions = new List<TransactionDTO>
             {
                 new() { Type = 1, Amount = 1000, Date = DateTime.UtcNow }, // income
@@ -51,7 +51,7 @@ namespace ReportingService.Tests.Services
         public async Task GetDashboardReportAsync_UsesCache_IfAvailable()
         {
             // Arrange
-            var userId = "user-2";
+            var userId = Guid.Parse("00000000-0000-0000-0000-000000000002");
             var report = new DashboardReportDTO { TotalIncome = 1234 };
             _cache.Set($"report:{userId}", report);
             var cancellationTokenSource = new CancellationTokenSource();
@@ -62,14 +62,14 @@ namespace ReportingService.Tests.Services
 
             // Assert
             result.Should().BeSameAs(report);
-            _transactionsClientMock.Verify(c => c.GetUserTransactionsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+            _transactionsClientMock.Verify(c => c.GetUserTransactionsAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
         public async Task GetDashboardReportAsync_ForceRefresh_BypassesCache()
         {
             // Arrange
-            var userId = "user-3";
+            var userId = Guid.Parse("00000000-0000-0000-0000-000000000001");
             var transactions = new List<TransactionDTO>
             {
                 new() { Type = 1, Amount = 500, Date = DateTime.UtcNow }

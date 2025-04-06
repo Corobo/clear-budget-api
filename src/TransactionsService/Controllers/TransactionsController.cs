@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Auth.Controllers;
 using TransactionsService.Models.DTO;
 using TransactionsService.Services;
 
@@ -28,7 +29,6 @@ namespace TransactionsService.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<TransactionDTO>> GetById(Guid id)
         {
-
             var transaction = await _transactionsService.GetByIdAsync(id, UserId);
             if (transaction == null)
                 return NotFound();
@@ -39,20 +39,14 @@ namespace TransactionsService.Controllers
         [HttpPost]
         public async Task<ActionResult<TransactionDTO>> Create(CreateTransactionDTO dto)
         {
-            var userId = User.FindFirst("sub")?.Value;
-            if (userId == null) return Unauthorized();
-
-            var created = await _transactionsService.CreateAsync(dto, userId);
+            var created = await _transactionsService.CreateAsync(dto, UserId);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, UpdateTransactionDTO dto)
         {
-            var userId = User.FindFirst("sub")?.Value;
-            if (userId == null) return Unauthorized();
-
-            var updated = await _transactionsService.UpdateAsync(id, dto, userId);
+            var updated = await _transactionsService.UpdateAsync(id, dto, UserId);
             if (!updated) return NotFound();
 
             return NoContent();
@@ -61,10 +55,7 @@ namespace TransactionsService.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var userId = User.FindFirst("sub")?.Value;
-            if (userId == null) return Unauthorized();
-
-            var deleted = await _transactionsService.DeleteAsync(id, userId);
+            var deleted = await _transactionsService.DeleteAsync(id, UserId);
             if (!deleted) return NotFound();
 
             return NoContent();

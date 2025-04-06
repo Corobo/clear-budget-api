@@ -11,7 +11,7 @@ namespace TransactionsService.Data
             if (context.Transactions.Any())
                 return; // DB already seeded
 
-            var defaultUserId = "00000000-0000-0000-0000-000000000001";
+            var defaultUserId = Guid.Parse("00000000-0000-0000-0000-000000000001");
             var defaultCategoryId = Guid.NewGuid(); // podrías relacionar con categorías reales si las tienes
 
             var transactions = new List<Transaction>
@@ -49,7 +49,7 @@ namespace TransactionsService.Data
             if (context.Transactions.Any())
                 return;
 
-            var defaultUserId = "00000000-0000-0000-0000-000000000001";
+            var defaultUserId = Guid.Parse("00000000-0000-0000-0000-000000000001");
             var defaultCategoryId = Guid.NewGuid();
 
             context.Transactions.AddRange(new[]

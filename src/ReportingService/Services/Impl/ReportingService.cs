@@ -17,9 +17,9 @@ namespace ReportingService.Services.Impl
             _cache = cache;
         }
 
-        public async Task<DashboardReportDTO> GetDashboardReportAsync(string userId, bool forceRefresh = false)
+        public async Task<DashboardReportDTO> GetDashboardReportAsync(Guid userId, bool forceRefresh = false)
         {
-            var cacheKey = $"report:{userId}";
+            var cacheKey = $"report:{userId.ToString()}";
 
             if (!forceRefresh && _cache.TryGetValue(cacheKey, out DashboardReportDTO cachedReport))
             {

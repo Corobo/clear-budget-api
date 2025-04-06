@@ -4,6 +4,6 @@ namespace ReportingService.Services
 {
     public interface IReportingService
     {
-        Task<DashboardReportDTO> GetDashboardReportAsync(string userId, bool forceRefresh = false);
+        Task<DashboardReportDTO> GetDashboardReportAsync(Guid userId, bool forceRefresh = false);
     }
 }

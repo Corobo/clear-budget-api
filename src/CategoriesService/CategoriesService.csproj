@@ -35,4 +35,8 @@
     <ProjectReference Include="..\Shared.Middleware\Shared.Middleware.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Repositories\Migrations\" />
+  </ItemGroup>
+
 </Project>

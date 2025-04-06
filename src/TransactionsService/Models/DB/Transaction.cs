@@ -7,7 +7,7 @@ namespace TransactionsService.Models.DB
         public Guid Id { get; set; }
 
         // User info from JWT
-        public string UserId { get; set; } = null!;
+        public Guid? UserId { get; set; } = null!;
 
         // Category association
         public Guid CategoryId { get; set; }

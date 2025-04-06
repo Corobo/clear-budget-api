@@ -31,28 +31,33 @@ public class CategoriesDbContext : DbContext
         modelBuilder.Entity<Category>(entity =>
         {
             // Table name
-            entity.ToTable("Categories");
+            entity.ToTable("categories");
 
             // Primary Key
             entity.HasKey(c => c.Id);
 
             // Properties
             entity.Property(c => c.Id)
+                .HasColumnName("id")
                 .IsRequired();
 
             entity.Property(c => c.Name)
+                .HasColumnName("name")
                 .IsRequired()
                 .HasMaxLength(100);
 
             entity.Property(c => c.Color)
+                .HasColumnName("color")
                 .IsRequired()
                 .HasMaxLength(20)
                 .HasDefaultValue("#000000");
 
             entity.Property(c => c.UserId)
+                .HasColumnName("user_id")
                 .IsRequired(false); // Nullable → admin category
 
             entity.Property(c => c.CreatedAt)
+                .HasColumnName("created_at")
                 .IsRequired()
                 .HasDefaultValueSql("NOW()");
         });
