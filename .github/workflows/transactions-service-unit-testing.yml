@@ -24,12 +24,11 @@ jobs:
       - name: Build
         run: dotnet build src/Clear-Budget-API.sln --no-restore --configuration Release
 
-      - name: Run TransactionsService.Tests
-        run: dotnet test src/TransactionsService.Tests/TransactionsService.Tests.csproj --no-build --configuration Release
+      - name: Run TransactionServiceTests
+        run: dotnet test src/TransactionsService.Tests/TransactionsService.Tests.csproj --no-build --configuration Release --filter FullyQualifiedName~TransactionServiceTests
 
-      - name: Run CategoryEventConsumerTest.Tests
-        run: dotnet test src/TransactionsService.Tests/CategoryEventConsumerTest.Tests.csproj --no-build --configuration Release
+      - name: Run CategoryEventConsumerTest
+        run: dotnet test src/TransactionsService.Tests/TransactionsService.Tests.csproj --no-build --configuration Release --filter FullyQualifiedName~CategoryEventConsumerTest
 
-      - name: Run CategoryCacheTests.Tests
-        run: dotnet test src/TransactionsService.Tests/CategoryCacheTests.Tests.csproj --no-build --configuration Release
-
+      - name: Run CategoryCacheTests
+        run: dotnet test src/TransactionsService.Tests/TransactionsService.Tests.csproj --no-build --configuration Release --filter FullyQualifiedName~CategoryCacheTests
