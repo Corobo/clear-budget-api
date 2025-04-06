@@ -361,5 +361,12 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/infra/keycloak/.terraform/providers/registry.terraform.io/mrparkers/keycloak
-/infra/rabbitmq/.terraform/providers/registry.terraform.io/cyrilgdn/rabbitmq/1.8.0
+
+
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+.terraform/
+crash.log
+*.tfplan
+*.tfapply
