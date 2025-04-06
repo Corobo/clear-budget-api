@@ -1,0 +1,151 @@
+version: "3.9"
+
+services:
+
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: clearbudget
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - clearbudget-net
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    networks:
+      - clearbudget-net
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:15672" ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.1.4
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8080:8080"
+    networks:
+      - clearbudget-net
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+
+  terraform:
+    build:
+      context: .
+      dockerfile: infra/docker/terraform-runner/Dockerfile
+    volumes:
+      - ./infra:/infra
+      - terraform-status:/shared
+    env_file:
+      - .env.terraform
+    networks:
+      - clearbudget-net
+    command: /entrypoint.sh
+    depends_on:
+      - keycloak
+      - rabbitmq
+    tty: true
+    stdin_open: true
+
+  categories-service:
+    build:
+      context: .
+      dockerfile: src/CategoriesService/Dockerfile
+    volumes:
+      - terraform-status:/shared
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+      ASPNETCORE_URLS: http://+:80
+      DLL_NAME: CategoriesService.dll
+    depends_on:
+      - terraform
+      - postgres
+      - rabbitmq
+    networks:
+      - clearbudget-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  transactions-service:
+    build:
+      context: .
+      dockerfile: src/TransactionsService/Dockerfile
+    volumes:
+      - terraform-status:/shared
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+      ASPNETCORE_URLS: http://+:80
+      DLL_NAME: TransactionsService.dll
+    depends_on:
+      - terraform
+      - postgres
+      - rabbitmq
+    networks:
+      - clearbudget-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  reporting-service:
+    build:
+      context: .
+      dockerfile: src/ReportingService/Dockerfile
+    volumes:
+      - terraform-status:/shared
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+      ASPNETCORE_URLS: http://+:80
+      DLL_NAME: ReportingService.dll
+    depends_on:
+      - terraform
+      - transactions-service
+    networks:
+      - clearbudget-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  gateway:
+    build:
+      context: .
+      dockerfile: src/APIGateway/Dockerfile
+    volumes:
+      - terraform-status:/shared
+    ports:
+      - "8081:80"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+      ASPNETCORE_URLS: http://+:80
+      DLL_NAME: APIGateway.dll
+    depends_on:
+      - categories-service
+      - transactions-service
+      - reporting-service
+    networks:
+      - clearbudget-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  postgres-data:
+  terraform-status:
+
+networks:
+  clearbudget-net:
+    driver: bridge
