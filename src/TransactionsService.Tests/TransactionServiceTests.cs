@@ -6,7 +6,7 @@ using TransactionsService.Models.Enums;
 using TransactionsService.Repositories;
 using TransactionsService.Services.Impl;
 
-namespace TransactionsService.Tests.Services
+namespace TransactionsService.Tests
 {
     public class TransactionServiceTests
     {
@@ -25,7 +25,7 @@ namespace TransactionsService.Tests.Services
         public async Task GetAllByUserIdAsync_ReturnsMappedTransactions()
         {
             // Arrange
-            var userId = "user-123";
+            var userId = Guid.NewGuid();
             var transactions = new List<Transaction> { new() { Id = Guid.NewGuid(), UserId = userId } };
             var dtos = new List<TransactionDTO> { new() { Id = transactions[0].Id } };
 
@@ -47,7 +47,7 @@ namespace TransactionsService.Tests.Services
         public async Task GetByIdAsync_ReturnsTransactionDTO_WhenExists()
         {
             var id = Guid.NewGuid();
-            var userId = "user-456";
+            var userId = Guid.NewGuid();
             var transaction = new Transaction { Id = id, UserId = userId };
             var dto = new TransactionDTO { Id = id };
 
@@ -65,7 +65,7 @@ namespace TransactionsService.Tests.Services
         [Fact]
         public async Task CreateAsync_MapsAndCreatesTransaction()
         {
-            var userId = "user-789";
+            var userId = Guid.NewGuid();
             var createDto = new CreateTransactionDTO
             {
                 Amount = 123,
@@ -93,7 +93,7 @@ namespace TransactionsService.Tests.Services
         public async Task UpdateAsync_ReturnsFalse_WhenTransactionNotFound()
         {
             var id = Guid.NewGuid();
-            var userId = "user-abc";
+            var userId = Guid.NewGuid();
             var updateDto = new UpdateTransactionDTO { Amount = 99 };
 
             _repositoryMock.Setup(r => r.GetByIdAsync(id, userId))
@@ -108,7 +108,7 @@ namespace TransactionsService.Tests.Services
         public async Task UpdateAsync_UpdatesTransaction_WhenExists()
         {
             var id = Guid.NewGuid();
-            var userId = "user-def";
+            var userId = Guid.NewGuid();
             var updateDto = new UpdateTransactionDTO { Description = "Updated" };
             var entity = new Transaction { Id = id, UserId = userId, Description = "Old" };
 
@@ -128,7 +128,7 @@ namespace TransactionsService.Tests.Services
         public async Task DeleteAsync_DelegatesToRepository()
         {
             var id = Guid.NewGuid();
-            var userId = "user-xyz";
+            var userId = Guid.NewGuid();
 
             _repositoryMock.Setup(r => r.DeleteAsync(id, userId))
                 .ReturnsAsync(true);
