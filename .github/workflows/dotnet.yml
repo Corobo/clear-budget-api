@@ -1,0 +1,37 @@
+name: .NET CI with PostgreSQL & RabbitMQ (Testcontainers)
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "*" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Display .NET version
+        run: dotnet --version
+
+      - name: Ensure Docker is running (Testcontainers needs this)
+        run: |
+          sudo systemctl start docker
+          docker info
+
+      - name: Restore dependencies
+        run: dotnet restore ClearBudget.sln
+
+      - name: Build solution
+        run: dotnet build ClearBudget.sln --no-restore --configuration Release
+
+      - name: Run tests (with Testcontainers)
+        run: dotnet test ClearBudget.sln --no-build --configuration Release --verbosity normal
