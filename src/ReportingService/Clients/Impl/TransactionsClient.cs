@@ -11,10 +11,10 @@ namespace ReportingService.Clients.Impl
             _httpClient = httpClient;
         }
 
-        public async Task<IEnumerable<TransactionDTO>> GetUserTransactionsAsync(string userId,
+        public async Task<IEnumerable<TransactionDTO>> GetUserTransactionsAsync(Guid userId,
             CancellationToken cancellationToken = default)
         {
-            var requestUri = $"/api/transactions?userId={userId}"; 
+            var requestUri = $"/api/transactions?userId={userId.ToString()}"; 
             var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
 
             try

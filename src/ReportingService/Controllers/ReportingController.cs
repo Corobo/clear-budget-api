@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ReportingService.Models.DTO;
 using ReportingService.Services;
+using Shared.Auth.Controllers;
 
 namespace ReportingService.Controllers
 {
