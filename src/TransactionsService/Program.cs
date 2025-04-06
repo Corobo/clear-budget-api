@@ -25,6 +25,9 @@ using TransactionsService.Services.Impl;
 using Shared.Auth.Extensions;
 using Shared.Logging.Extensions;
 using Shared.Middleware.Extensions;
+using Shared.Auth.Impl;
+using Shared.Auth;
+using Shared.Auth.Clients.Impl;
 
 var builder = WebApplication.CreateBuilder(args);
 
