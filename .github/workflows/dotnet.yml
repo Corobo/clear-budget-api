@@ -28,10 +28,10 @@ jobs:
           docker info
 
       - name: Restore dependencies
-        run: dotnet restore Clear-Budget-API.sln
+        run: dotnet restore src/Clear-Budget-API.sln
 
       - name: Build solution
-        run: dotnet build Clear-Budget-API.sln --no-restore --configuration Release
+        run: dotnet build src/Clear-Budget-API.sln --no-restore --configuration Release
 
       - name: Run tests (with Testcontainers)
-        run: dotnet test Clear-Budget-API.sln --no-build --configuration Release --verbosity normal
+        run: dotnet test src/Clear-Budget-API.sln --no-build --configuration Release --verbosity normal
