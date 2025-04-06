@@ -1,0 +1,28 @@
+name: Shared.Messaging .NET Unit Tests
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "*" ]
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore src/Clear-Budget-API.sln
+
+      - name: Build
+        run: dotnet build src/Clear-Budget-API.sln --no-restore --configuration Release
+
+      - name: Run TransactionServiceTests
+        run: dotnet test src/Shared.Messaging.Tests/Shared.Messaging.Tests.csproj --no-build --configuration Release --filter FullyQualifiedName~EventBusConsumerTests
