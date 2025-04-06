@@ -1,0 +1,30 @@
+name: .NET Unit Tests
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "*" ]
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore ClearBudget.sln
+
+      - name: Build
+        run: dotnet build ClearBudget.sln --no-restore --configuration Release
+
+      - name: Run unit tests
+        run: dotnet test tests/TransactionsService.Tests/TransactionsService.Tests.csproj --no-build --configuration Release
+        run: dotnet test tests/TransactionsService.Tests/CategoryEventConsumerTest.Tests.csproj --no-build --configuration Release
+        run: dotnet test tests/TransactionsService.Tests/CategoryCacheTests.Tests.csproj --no-build --configuration Release
