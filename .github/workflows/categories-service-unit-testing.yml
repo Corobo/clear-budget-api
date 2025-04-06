@@ -1,4 +1,4 @@
-name: CategoriesService .NET Unit Tests
+name: 🧪 Unit Tests - CategoriesService by class
 
 on:
   push:
@@ -11,18 +11,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: 🧾 Checkout repo
+        uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: ⚙️ Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
 
-      - name: Restore
+      - name: 📦 Restore dependencies
         run: dotnet restore src/Clear-Budget-API.sln
 
-      - name: Build
+      - name: 🏗️ Build solution
         run: dotnet build src/Clear-Budget-API.sln --no-restore --configuration Release
 
-      - name: Run TransactionServiceTests
+      - name: 🔍 Run CategoriesServiceTests
         run: dotnet test src/CategoriesService.Tests/CategoriesService.Tests.csproj --no-build --configuration Release --filter FullyQualifiedName~CategoriesServiceTests
