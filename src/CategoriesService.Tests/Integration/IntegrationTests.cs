@@ -31,20 +31,7 @@ namespace CategoriesService.Tests.Integration
         private static HttpClient CreateAuthenticatedClient(CategoriesDbFixture fixture, RabbitMqContainerFixture rabbitMqContainerFixture)
         {
             var factory = new CategoriesWebAppFactory(fixture.ConnectionString,RabbitTestSettings.UseRabbitSettings(rabbitMqContainerFixture));
-
-
-            return factory.WithWebHostBuilder(builder =>
-            {
-                builder.UseSetting("ConnectionStrings:DefaultConnection", fixture.ConnectionString);
-                builder.ConfigureServices(services =>
-                {
-                    services.PostConfigureAll<AuthenticationOptions>(opts =>
-                    {
-                        opts.DefaultAuthenticateScheme = "Test";
-                        opts.DefaultChallengeScheme = "Test";
-                    });
-                });
-            }).CreateClient();
+            return factory.CreateClient();
         }
 
         [Fact]
