@@ -1,4 +1,4 @@
-﻿namespace TransactionsService.Clients
+﻿namespace Shared.Auth
 {
     public interface IAuthTokenClient
     {

@@ -9,6 +9,9 @@ using System.Security.Claims;
 using Shared.Auth.Extensions;
 using Shared.Logging.Extensions;
 using Shared.Middleware.Extensions;
+using Shared.Auth.Impl;
+using Shared.Auth;
+using Shared.Auth.Clients.Impl;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +25,7 @@ var corsOrigins = config.GetSection("Cors:AllowedOrigins").Get<string[]>();
 
 // === Services ===
 builder.Services.AddScoped<IReportingService, ReportingService.Services.Impl.ReportingService>();
+builder.Services.AddTransient<ServiceAuthHandler>();
 
 // === Logging ===
 builder.Host.UseSharedSerilog("ReportingService");
@@ -82,7 +86,8 @@ builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient<ITransactionsClient, TransactionsClient>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Services:Transactions"]);
-});
+}).AddHttpMessageHandler<ServiceAuthHandler>();
+builder.Services.AddHttpClient<IAuthTokenClient, AuthTokenClient>();
 
 var app = builder.Build();
 

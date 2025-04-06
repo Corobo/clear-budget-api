@@ -26,6 +26,15 @@ namespace TransactionsService.Controllers
             return Ok(transactions);
         }
 
+
+        [HttpGet("by-user/{userId}")]
+        [Authorize(Roles = "clear-budget-m2m")]
+        public async Task<ActionResult<IEnumerable<TransactionDTO>>> GetAllByUser(Guid userId)
+        {
+            var transactions = await _transactionsService.GetAllByUserIdAsync(userId);
+            return Ok(transactions);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<TransactionDTO>> GetById(Guid id)
         {
