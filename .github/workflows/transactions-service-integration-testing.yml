@@ -34,4 +34,4 @@ jobs:
         run: find . -name "appsettings*.json"
 
       - name: 🧪 Run integration tests
-        run: dotnet test src/TransactionsService.Tests/TransactionsService.Tests.csproj --no-build --configuration Testing --verbosity normal --filter FullyQualifiedName~IntegrationTests
+        run: dotnet test src/TransactionsService.Tests/TransactionsService.Tests.csproj --no-build --configuration Release --verbosity normal --filter FullyQualifiedName~IntegrationTests
