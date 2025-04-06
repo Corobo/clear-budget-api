@@ -2,14 +2,13 @@
 using CategoriesService.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Auth.Controllers;
 using System.Security.Claims;
 
 namespace CategoriesService.Controllers;
 
-[ApiController]
-[Authorize(Roles = "clear-budget")]
 [Route("api/[controller]")]
-public class CategoriesController : ControllerBase
+public class CategoriesController : AuthorizedControllerBase
 {
     private readonly ICategoryService _service;
 
@@ -19,9 +18,9 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetMergedCategories([FromQuery] Guid userId)
+    public async Task<IActionResult> GetMergedCategories()
     {
-        var result = await _service.GetMergedCategoriesAsync(userId);
+        var result = await _service.GetMergedCategoriesAsync(UserId);
         return Ok(result);
     }
 
@@ -44,9 +43,8 @@ public class CategoriesController : ControllerBase
     [HttpPost("user")]
     public async Task<IActionResult> CreateUserCategory([FromBody] CategoryCreateDTO dto)
     {
-        var userId = GetUserIdFromToken();
-        var result = await _service.CreateUserCategoryAsync(userId, dto);
-        return CreatedAtAction(nameof(GetMergedCategories), new { userId }, result);
+        var result = await _service.CreateUserCategoryAsync(UserId, dto);
+        return CreatedAtAction(nameof(GetMergedCategories), new { UserId }, result);
     }
 
     [HttpPost("admin")]
@@ -60,16 +58,14 @@ public class CategoriesController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateCategoryColor(Guid id, [FromBody] CategoryUpdateDTO dto)
     {
-        var userId = GetUserIdFromToken();
-        var result = await _service.UpdateCategoryColorAsync(id, userId, dto);
+        var result = await _service.UpdateCategoryColorAsync(id, UserId, dto);
         return result ? NoContent() : NotFound();
     }
 
     [HttpDelete("user/{id}")]
     public async Task<IActionResult> DeleteUserCategory(Guid id)
     {
-        var userId = GetUserIdFromToken();
-        var result = await _service.DeleteUserCategoryAsync(id, userId);
+        var result = await _service.DeleteUserCategoryAsync(id, UserId);
         return result ? NoContent() : NotFound();
     }
 
@@ -81,13 +77,4 @@ public class CategoriesController : ControllerBase
         return result ? NoContent() : NotFound();
     }
 
-    private Guid GetUserIdFromToken()
-    {
-        var claim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                 ?? User.FindFirst("sub")?.Value;
-
-        return Guid.TryParse(claim, out var id)
-            ? id
-            : throw new UnauthorizedAccessException("Invalid user ID in token");
-    }
 }
