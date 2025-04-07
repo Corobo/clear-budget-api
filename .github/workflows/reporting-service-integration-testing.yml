@@ -1,0 +1,37 @@
+name: 🧪 Integration Tests - ReportingService
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "*" ]
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🧾 Checkout repo
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: 🐳 Ensure Docker is running (for Testcontainers)
+        run: |
+          sudo systemctl start docker
+          docker info
+
+      - name: 📦 Restore dependencies
+        run: dotnet restore src/Clear-Budget-API.sln
+
+      - name: 🏗️ Build solution
+        run: dotnet build src/Clear-Budget-API.sln --no-restore --configuration Release
+
+      - name: 🔍 List copied appsettings (debug)
+        run: find . -name "appsettings*.json"
+
+      - name: 🧪 Run integration tests
+        run: dotnet test src/ReportingService.Tests/ReportingService.Tests.csproj --no-build --configuration Release --verbosity normal --filter FullyQualifiedName~ReportingControllerTests

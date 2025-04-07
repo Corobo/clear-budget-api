@@ -1,0 +1,29 @@
+name: 🧪 Unit Tests - ReportingService by class
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "*" ]
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🧾 Checkout repo
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: 📦 Restore dependencies
+        run: dotnet restore src/Clear-Budget-API.sln
+
+      - name: 🏗️ Build solution
+        run: dotnet build src/Clear-Budget-API.sln --no-restore --configuration Release
+
+      - name: 🔍 Run ReportingServiceTests
+        run: dotnet test src/ReportingService.Tests/ReportingService.Tests.csproj --no-build --configuration Release --filter FullyQualifiedName~ReportingServiceTests

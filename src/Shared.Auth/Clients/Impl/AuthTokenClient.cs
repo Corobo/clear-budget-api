@@ -22,9 +22,6 @@ namespace Shared.Auth.Clients.Impl
             var clientSecret = _config["Auth:ClientSecret"];
             var tokenUrl = _config["Auth:TokenUrl"];
 
-            Log.Information("Getting access token from {TokenUrl}", tokenUrl);
-            Log.Information("ClientId: {ClientId}", clientId);
-            Log.Information("ClientSecret: {ClientSecret}", clientSecret);
 
             var body = new FormUrlEncodedContent(new[]
             {
