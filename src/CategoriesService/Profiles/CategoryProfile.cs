@@ -8,6 +8,12 @@ public class CategoryProfile : Profile
 {
     public CategoryProfile()
     {
-        CreateMap<Category, CategoryDTO>();
+        CreateMap<Category, CategoryDTO>()
+           .ConstructUsing(src => new CategoryDTO(
+               src.Id,
+               src.Name,
+               src.Color,
+               src.UserId == null
+           ));
     }
 }

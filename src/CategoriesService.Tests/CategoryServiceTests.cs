@@ -52,14 +52,14 @@ namespace CategoriesService.Tests
 
             var categoryDtos = new List<CategoryDTO>
         {
-            new(categories[0].Id, "Food", "#ff0000")
+            new(categories[0].Id, "Food", "#ff0000", true)
         };
 
             _repoMock.Setup(r => r.GetAdminCategoriesAsync())
                 .ReturnsAsync(categories);
 
             _mapperMock.Setup(m => m.Map<CategoryDTO>(It.IsAny<Category>()))
-                .Returns<Category>(c => new CategoryDTO(c.Id, c.Name, c.Color));
+                .Returns<Category>(c => new CategoryDTO(c.Id, c.Name, c.Color, true));
 
             // Act
             var result = await _service.GetAdminCategoriesAsync();
@@ -84,7 +84,7 @@ namespace CategoriesService.Tests
 
             _mapperMock.Setup(m => m.Map<Category>(dto)).Returns(category);
             _mapperMock.Setup(m => m.Map<CategoryDTO>(It.IsAny<Category>()))
-                .Returns<Category>(c => new CategoryDTO(c.Id, c.Name, c.Color));
+                .Returns<Category>(c => new CategoryDTO(c.Id, c.Name, c.Color, true));
 
             _repoMock.Setup(r => r.AddAsync(category)).Returns(Task.FromResult(1));
             _repoMock.Setup(r => r.SaveChangesAsync()).Returns(Task.FromResult(1));

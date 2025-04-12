@@ -62,6 +62,14 @@ public class CategoriesController : AuthorizedControllerBase
         return result ? NoContent() : NotFound();
     }
 
+    [HttpPut("admin/{id}")]
+    [Authorize(Roles = "clear-budget-admin")]
+    public async Task<IActionResult> UpdateAdminCategoryColor(Guid id, [FromBody] CategoryUpdateDTO dto)
+    {
+        var result = await _service.UpdateCategoryColorAsync(id, Guid.Empty, dto);
+        return result ? NoContent() : NotFound();
+    }
+
     [HttpDelete("user/{id}")]
     public async Task<IActionResult> DeleteUserCategory(Guid id)
     {
