@@ -40,7 +40,6 @@ public class CategoriesController : AuthorizedControllerBase
         return Ok(result);
     }
 
-    [HttpPost("user")]
     public async Task<IActionResult> CreateUserCategory([FromBody] CategoryCreateDTO dto)
     {
         var result = await _service.CreateUserCategoryAsync(UserId, dto);
@@ -70,7 +69,7 @@ public class CategoriesController : AuthorizedControllerBase
         return result ? NoContent() : NotFound();
     }
 
-    [HttpDelete("user/{id}")]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteUserCategory(Guid id)
     {
         var result = await _service.DeleteUserCategoryAsync(id, UserId);
