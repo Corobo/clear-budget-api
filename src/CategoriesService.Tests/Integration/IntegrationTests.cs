@@ -1,10 +1,7 @@
 ﻿using CategoriesService.Models.DTO;
 using CategoriesService.Tests.Integration.Factories;
 using FluentAssertions;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
-using Serilog;
 using Shared.Testing.Containers;
 using Shared.Testing.Settings;
 using System.Net;
@@ -45,7 +42,7 @@ namespace CategoriesService.Tests.Integration
         public async Task CreateUserCategory_ReturnsCreated()
         {
             var body = JsonContent.Create(new { name = "TestCat", color = "#abc123" });
-            var response = await _client.PostAsync("/api/categories/user", body);
+            var response = await _client.PostAsync("/api/categories", body);
             response.StatusCode.Should().Be(HttpStatusCode.Created);
         }
 
@@ -66,7 +63,7 @@ namespace CategoriesService.Tests.Integration
         {
             var categoryId = await CreateTestCategory();
 
-            var response = await _client.DeleteAsync($"/api/categories/user/{categoryId}");
+            var response = await _client.DeleteAsync($"/api/categories/{categoryId}");
             response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
 
@@ -86,7 +83,7 @@ namespace CategoriesService.Tests.Integration
             };
 
             // Act
-            var response = await client.PostAsJsonAsync("/api/categories/user", request);
+            var response = await client.PostAsJsonAsync("/api/categories", request);
             response.EnsureSuccessStatusCode();
 
             // Assert
@@ -118,7 +115,7 @@ namespace CategoriesService.Tests.Integration
         protected async Task<Guid> CreateTestCategory()
         {
             var body = JsonContent.Create(new { name = $"Temp-{Guid.NewGuid()}", color = "#333333" });
-            var response = await _client.PostAsync("/api/categories/user", body);
+            var response = await _client.PostAsync("/api/categories", body);
             response.EnsureSuccessStatusCode();
 
             var created = await response.Content.ReadFromJsonAsync<CategoryDTO>();
